@@ -894,7 +894,11 @@ async function loadConfig() {
     return;
   }
   try {
-    const r = await fetch(CONFIG.scriptUrl + '?action=getConfig');
+    // 8초 타임아웃 — 응답 안 오면 fallback 으로 폼 표시
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    const r = await fetch(CONFIG.scriptUrl + '?action=getConfig', { signal: controller.signal });
+    clearTimeout(timeoutId);
     if (!r.ok) throw new Error('서버 응답 ' + r.status);
     const data = await r.json();
     if (data && Array.isArray(data.products) && data.products.length > 0) {
@@ -910,7 +914,6 @@ async function loadConfig() {
 function renderShop() {
   document.getElementById('shopTitle').textContent = SHOP.shopName;
   document.title = `주문하기 - ${SHOP.shopName}`;
-  document.getElementById('headerEmoji').textContent = SHOP.headerEmoji || '🍐';
 
   document.getElementById('bankDisplay').textContent =
     `${SHOP.bank.name} ${SHOP.bank.account}`;
