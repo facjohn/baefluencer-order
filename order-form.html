@@ -418,6 +418,66 @@
       margin: 16px 0;
       font-size: 15px;
     }
+    .success-bank {
+      max-width: 340px;
+      margin: 14px auto 0;
+      background: var(--color-primary-light);
+      border: 1px solid rgba(27,107,42,0.15);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-primary-dark);
+    }
+    .success-bank .copy-btn {
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      flex-shrink: 0;
+    }
+    .success-bank .copy-btn:active { transform: scale(0.95); }
+    .success-bank .info { flex: 1; text-align: left; }
+    .success-bank .holder {
+      font-size: 11.5px;
+      color: var(--color-text-sub);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+    .success-bank .holder strong {
+      color: var(--color-primary-dark);
+      font-weight: 700;
+    }
+    .success-amount {
+      max-width: 340px;
+      margin: 14px auto 8px;
+      background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: white;
+    }
+    .success-amount .label {
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+    .success-amount .amount {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
 
     /* Error */
     .field-error {
@@ -639,10 +699,19 @@
     <div class="check">✅</div>
     <h2>주문이 완료되었습니다!</h2>
     <div class="order-id" id="orderId"></div>
-    <p>
-      입금 확인 후 순차적으로 발송됩니다.<br>
-      문의사항은 인스타 DM으로 연락주세요.
-    </p>
+    <p style="margin-bottom:8px;">주문해 주셔서 감사합니다.</p>
+    <div class="success-amount">
+      <span class="label">입금 금액</span>
+      <span class="amount" id="successAmount"></span>
+    </div>
+    <div class="success-bank">
+      <div class="info">
+        <div id="successBankDisplay"></div>
+        <div class="holder">예금주 <strong id="successHolder"></strong></div>
+      </div>
+      <button class="copy-btn" onclick="copyAccount()">복사</button>
+    </div>
+    <p style="margin-top:18px;">입금 확인 후 순차적으로 발송됩니다.</p>
   </div>
 </div>
 
@@ -995,10 +1064,8 @@ async function submitOrder() {
   btn.classList.add('loading');
   
   const product = SHOP.products[selectedProduct];
-  const orderId = 'ORD-' + Date.now().toString(36).toUpperCase();
-  
+
   const orderData = {
-    orderId: orderId,
     product: product.name,
     unitPrice: product.price,
     quantity: quantity,
@@ -1029,12 +1096,12 @@ async function submitOrder() {
 
     const result = await response.json();
 
-    if (!result.success || result.orderId !== orderId) {
+    if (!result.success || !result.orderId) {
       throw new Error(result.error || '주문 저장 확인 실패');
     }
 
-    // ✅ 시트 저장 확인됨 → 성공 화면
-    showSuccess(orderId, orderData.totalPrice);
+    // ✅ 시트 저장 확인됨 → 서버가 만든 주문번호로 성공 화면
+    showSuccess(result.orderId, orderData.totalPrice);
   } catch (error) {
     console.error('Submit error:', error);
     alert(
@@ -1051,6 +1118,11 @@ async function submitOrder() {
 function showSuccess(orderId, totalPrice) {
   document.getElementById('formWrap').classList.add('hidden');
   document.getElementById('orderId').textContent = orderId;
+  document.getElementById('successBankDisplay').textContent =
+    `${SHOP.bank.name} ${SHOP.bank.account}`;
+  document.getElementById('successHolder').textContent = SHOP.bank.holder || '';
+  document.getElementById('successAmount').textContent =
+    (totalPrice || 0).toLocaleString() + '원';
   const screen = document.getElementById('successScreen');
   screen.classList.add('show');
   window.scrollTo({ top: 0, behavior: 'smooth' });
