@@ -417,7 +417,7 @@
     .success-screen {
       display: none;
       text-align: center;
-      padding: 60px 20px;
+      padding: 4px 20px 60px;
     }
     .success-screen.show { display: block; }
     .success-screen .check {
@@ -428,7 +428,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 20px;
+      margin: 0 auto 14px;
       font-size: 36px;
       animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
@@ -485,35 +485,90 @@
       flex-shrink: 0;
     }
     .success-bank .copy-btn:active { transform: scale(0.95); }
-    .success-cta {
-      margin: 32px auto 0;
-      max-width: 340px;
-      padding: 18px 16px;
-      font-size: 14px;
-      font-weight: 800;
-      line-height: 1.7;
+    /* Social Follow CTA */
+    .social-cta {
+      margin: 36px auto 0;
+      max-width: 360px;
       text-align: center;
-      letter-spacing: -0.3px;
-      background: linear-gradient(
-        90deg,
-        #DC2626 0%,
-        #DC2626 30%,
-        #FFD700 45%,
-        #FFFFFF 50%,
-        #FFD700 55%,
-        #DC2626 70%,
-        #DC2626 100%
-      );
-      background-size: 300% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      color: transparent;
-      animation: ctaShimmer 3s linear infinite;
     }
-    @keyframes ctaShimmer {
-      0%   { background-position: 300% center; }
-      100% { background-position: -300% center; }
+    .social-cta-headline {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      letter-spacing: -0.4px;
+      margin-bottom: 4px;
+    }
+    .social-cta-handle {
+      display: inline-block;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--color-accent);
+      letter-spacing: -0.2px;
+      margin-bottom: 18px;
+      padding: 4px 12px;
+      background: var(--color-accent-light);
+      border-radius: 999px;
+    }
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+    }
+    .social-btn {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: white;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.14);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+      animation: socialFloat 3s ease-in-out infinite;
+    }
+    .social-btn:nth-child(2) { animation-delay: 0.4s; }
+    .social-btn:nth-child(3) { animation-delay: 0.8s; }
+    .social-btn:active { transform: scale(0.92); }
+    .social-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.2);
+    }
+    .social-btn svg {
+      width: 30px;
+      height: 30px;
+      fill: currentColor;
+    }
+    .social-btn .social-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      margin-top: 2px;
+      opacity: 0.95;
+    }
+    .social-btn.youtube {
+      background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+    }
+    .social-btn.instagram {
+      background: linear-gradient(45deg,
+        #F09433 0%,
+        #E6683C 25%,
+        #DC2743 50%,
+        #CC2366 75%,
+        #BC1888 100%);
+    }
+    .social-btn.tiktok {
+      background: #010101;
+    }
+    .social-btn.tiktok svg {
+      filter: drop-shadow(1.2px 0 0 #FF0050) drop-shadow(-1.2px 0 0 #00F2EA);
+    }
+    @keyframes socialFloat {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-4px); }
     }
     .success-bank .info { flex: 1; text-align: left; }
     .success-bank .holder {
@@ -599,31 +654,154 @@
       min-height: 70vh;
       text-align: center;
       padding: 40px 20px;
+      position: relative;
+      overflow: hidden;
     }
     .loading-screen.hidden { display: none; }
-    .loading-screen .brand {
-      font-size: 38px;
-      font-weight: 800;
-      letter-spacing: -0.8px;
+    /* 로딩 화면 — "배 인플루언서" → "배+인플루언서" → "배플루언서" 강렬 만화틱 시퀀스 */
+    .loading-screen .brand-anim {
+      font-size: 44px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      color: var(--color-primary-dark);
       margin-bottom: 28px;
-      background: linear-gradient(
-        90deg,
-        var(--color-primary-dark) 0%,
-        var(--color-primary) 25%,
-        #FFD54F 50%,
-        var(--color-primary) 75%,
-        var(--color-primary-dark) 100%
-      );
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      color: transparent;
-      animation: shimmer 2.5s linear infinite;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      text-align: center;
+      font-family: inherit;
+      position: relative;
+      transform-origin: center;
+      animation: brandStage 4s ease-in-out infinite;
     }
-    @keyframes shimmer {
-      0%   { background-position: 200% center; }
-      100% { background-position: -200% center; }
+    /* 무대 자체가 1단계 차분, 2단계 진동, 3단계 충격 흔들림 */
+    @keyframes brandStage {
+      0%, 22%  { transform: scale(1) rotate(0); }
+      26%      { transform: scale(1.06) rotate(0); }
+      30%      { transform: scale(1) rotate(0); }
+      48%      { transform: scale(1) rotate(0); }
+      52%      { transform: translateX(-4px) rotate(-1deg); }
+      54%      { transform: translateX(4px) rotate(1deg); }
+      56%      { transform: translateX(-3px) rotate(-1deg); }
+      58%      { transform: translateX(3px) rotate(1deg); }
+      62%      { transform: scale(1.12) translateY(-3px); }
+      66%      { transform: scale(0.95) translateY(2px); }
+      72%, 100%{ transform: scale(1) translateY(0); }
+    }
+    .loading-screen .brand-anim > span {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    /* 배 / 플루언서 — 정적 글자에도 미세 떨림과 마지막 도착 바운스 */
+    .loading-screen .b-static {
+      animation: brandStatic 4s ease-in-out infinite;
+      transform-origin: center bottom;
+    }
+    @keyframes brandStatic {
+      0%, 50%  { transform: translateY(0) rotate(0); }
+      54%      { transform: translateY(-2px) rotate(-1.5deg); }
+      58%      { transform: translateY(-1px) rotate(1.5deg); }
+      62%      { transform: translateY(-6px) scale(1.08); }
+      68%      { transform: translateY(2px) scale(0.95); }
+      74%      { transform: translateY(-2px) scale(1.02); }
+      80%, 100%{ transform: translateY(0) scale(1); }
+    }
+    /* 배 ↔ 인 사이 공백 — 1단계 좁게, 2단계 휙 넓어짐, 3단계 사라짐 */
+    .loading-screen .b-gap {
+      animation: brandGap 4s ease-in-out infinite;
+    }
+    @keyframes brandGap {
+      0%, 18%   { width: 0.16em; }
+      22%       { width: 0.95em; }
+      26%       { width: 0.55em; }
+      30%, 50%  { width: 0.72em; }
+      62%, 100% { width: 0; }
+    }
+    /* + 글자 — 회전 폭발 등장 → 부풀음 → 빨강 분노 → 인 잡아먹기 */
+    .loading-screen .b-plus {
+      color: #E8722A;
+      font-weight: 900;
+      overflow: hidden;
+      animation: brandPlus 4s ease-in-out infinite;
+      transform-origin: center;
+      text-shadow: 0 0 0 transparent;
+    }
+    @keyframes brandPlus {
+      0%, 18%  { width: 0;     transform: scale(0) rotate(0);            opacity: 0; color: #E8722A; text-shadow: 0 0 0 transparent; }
+      21%      { width: 0;     transform: scale(2.4) rotate(-220deg);    opacity: 1; color: #FFB400; text-shadow: 0 0 14px rgba(255,180,0,0.8); }
+      25%      { width: 0.85em;transform: scale(0.55) rotate(-360deg);   opacity: 1; color: #E8722A; text-shadow: 0 0 6px rgba(232,114,42,0.6); }
+      30%      { width: 0.7em; transform: scale(1.5) rotate(-380deg);    opacity: 1; }
+      36%      { width: 0.7em; transform: scale(0.92) rotate(-360deg);   opacity: 1; }
+      42%      { width: 0.7em; transform: scale(1.1) rotate(-360deg) translateY(-3px); }
+      48%      { width: 0.7em; transform: scale(1) rotate(-360deg);      color: #DC2626; text-shadow: 0 0 10px rgba(220,38,38,0.7); }
+      52%      { width: 0.7em; transform: scale(1.35) rotate(-365deg) translateX(-2px); color: #DC2626; }
+      56%      { width: 0.7em; transform: scale(1.4) rotate(-355deg) translateX(2px);  color: #DC2626; }
+      60%      { width: 0.7em; transform: scale(1.6) rotate(-360deg) translateX(0.4em); color: #DC2626; text-shadow: 0 0 16px rgba(220,38,38,0.9); }
+      64%      { width: 0;     transform: scale(0.4) rotate(-720deg) translateX(0.55em); opacity: 0; }
+      100%     { width: 0;     transform: scale(0) rotate(-720deg);      opacity: 0; }
+    }
+    /* 인 글자 — 위험 감지 떨림 → 점프 회피 → 잡아먹힘 (찌그러짐+소실) */
+    .loading-screen .b-in {
+      overflow: hidden;
+      animation: brandIn 4s ease-in-out infinite;
+      transform-origin: center bottom;
+    }
+    @keyframes brandIn {
+      0%, 30% { width: 0.95em; transform: scale(1) rotate(0) translate(0,0); color: inherit; }
+      34%     { width: 0.95em; transform: scale(1) rotate(-6deg) translate(2px,0); }
+      38%     { width: 0.95em; transform: scale(1) rotate(6deg) translate(-2px,0); }
+      42%     { width: 0.95em; transform: scale(1.05) rotate(-4deg) translate(2px,0); }
+      46%     { width: 0.95em; transform: scale(1) rotate(0) translate(0,0); }
+      52%     { width: 0.95em; transform: scale(1.3) translate(0,-12px) rotate(-8deg); color: #FF8C00; }
+      56%     { width: 0.95em; transform: scale(1.1) translate(0,-6px) rotate(8deg);   color: #FF8C00; }
+      60%     { width: 0.95em; transform: scale(0.7) translate(0,4px) rotate(-15deg);  color: #DC2626; }
+      63%     { width: 0.5em;  transform: scale(0.4) translate(0,2px) rotate(-30deg);  color: #DC2626; opacity: 0.7; }
+      66%     { width: 0;      transform: scale(0) rotate(-90deg);   opacity: 0; }
+      100%    { width: 0;      transform: scale(0); opacity: 0; }
+    }
+    /* 모션 라인 — + 가 인을 향해 돌진할 때 나타나는 만화 속도선 */
+    .loading-screen .speed-lines {
+      position: absolute;
+      top: calc(35% - 4px);
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      width: 140px;
+      height: 8px;
+      opacity: 0;
+      animation: speedLines 4s ease-in-out infinite;
+      z-index: 1;
+    }
+    .loading-screen .speed-lines::before,
+    .loading-screen .speed-lines::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 22px;
+      height: 3px;
+      background: #DC2626;
+      border-radius: 2px;
+      transform: translateY(-50%);
+    }
+    .loading-screen .speed-lines::before {
+      left: 0;
+      box-shadow:
+        -28px -8px 0 -1px #E8722A,
+        -32px 8px 0 -1px #FFB400;
+    }
+    .loading-screen .speed-lines::after {
+      right: 0;
+      box-shadow:
+        28px -8px 0 -1px #E8722A,
+        32px 8px 0 -1px #FFB400;
+    }
+    @keyframes speedLines {
+      0%, 50%  { opacity: 0; transform: translate(-50%, -50%) scaleX(0.4); }
+      55%      { opacity: 1; transform: translate(-50%, -50%) scaleX(1); }
+      62%      { opacity: 1; transform: translate(-50%, -50%) scaleX(1.3); }
+      66%      { opacity: 0; transform: translate(-50%, -50%) scaleX(1.5); }
+      100%     { opacity: 0; transform: translate(-50%, -50%) scaleX(0.4); }
     }
     .loading-screen .spinner {
       width: 44px;
@@ -686,7 +864,10 @@
 <div class="container">
   <!-- LOADING SCREEN -->
   <div class="loading-screen" id="loadingScreen">
-    <div class="brand">배플루언서</div>
+    <div class="speed-lines"></div>
+    <div class="brand-anim">
+      <span class="b-static">배</span><span class="b-gap"></span><span class="b-plus">+</span><span class="b-in">인</span><span class="b-static">플루언서</span>
+    </div>
     <div class="spinner"></div>
     <p>잠시만 기다려 주세요...</p>
   </div>
@@ -843,9 +1024,23 @@
       <button class="copy-btn" onclick="copyAccount()">복사</button>
     </div>
     <p style="margin-top:18px;">입금 확인 후 순차적으로 발송됩니다.</p>
-    <div class="success-cta">
-      @배플루언서 유튜브, 인스타그램, 틱톡<br>
-      팔로우하고 라이브방송 놓치지 마세요!
+    <div class="social-cta">
+      <div class="social-cta-headline">팔로우하고 라이브방송 놓치지 마세요!</div>
+      <div class="social-cta-handle">@배플루언서</div>
+      <div class="social-icons">
+        <a href="https://www.youtube.com/@%EB%B0%B0%ED%94%8C%EB%A3%A8%EC%96%B8%EC%84%9C" target="_blank" rel="noopener" class="social-btn youtube" aria-label="YouTube">
+          <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          <span class="social-label">YouTube</span>
+        </a>
+        <a href="https://www.instagram.com/baefluencer/" target="_blank" rel="noopener" class="social-btn instagram" aria-label="Instagram">
+          <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          <span class="social-label">Instagram</span>
+        </a>
+        <a href="https://www.tiktok.com/@baefluencer" target="_blank" rel="noopener" class="social-btn tiktok" aria-label="TikTok">
+          <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/></svg>
+          <span class="social-label">TikTok</span>
+        </a>
+      </div>
     </div>
   </div>
 </div>
