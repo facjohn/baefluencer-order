@@ -1167,8 +1167,7 @@ async function submitOrder() {
     console.error('Submit error:', error);
     alert(
       '⚠️ 주문이 접수되지 않았습니다.\n\n' +
-      '• 입금하지 마시고 잠시 후 다시 시도해주세요.\n' +
-      '• 계속 문제가 발생하면 인스타 DM으로 연락주세요.\n\n' +
+      '입금하지 마시고 잠시 후 다시 시도해주세요.\n\n' +
       `(에러: ${error.message})`
     );
     btn.disabled = false;
