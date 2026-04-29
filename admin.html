@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>관리자 - 주문폼 설정</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary: #1B6B2A;
+      --color-primary-light: #E8F5E9;
+      --color-primary-dark: #0D4A1A;
+      --color-accent: #E8722A;
+      --color-bg: #FAFAF5;
+      --color-card: #FFFFFF;
+      --color-text: #1A1A1A;
+      --color-text-sub: #6B7280;
+      --color-border: #E5E7EB;
+      --color-error: #DC2626;
+      --color-success: #16A34A;
+      --color-danger-bg: #FEF2F2;
+      --radius: 14px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 100px;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      padding: 28px 0 20px;
+    }
+    .header h1 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      letter-spacing: -0.5px;
+    }
+    .header .subtitle {
+      font-size: 13px;
+      color: var(--color-text-sub);
+      margin-top: 4px;
+    }
+    .header .preview-link {
+      display: inline-block;
+      font-size: 12.5px;
+      color: var(--color-primary);
+      margin-top: 8px;
+      text-decoration: none;
+      padding: 4px 10px;
+      border: 1px solid var(--color-primary);
+      border-radius: 8px;
+    }
+
+    /* Login Screen */
+    .login-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+      padding: 0 20px;
+    }
+    .login-screen.hidden { display: none; }
+    .login-card {
+      background: var(--color-card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px 24px;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+    }
+    .login-card .lock-icon {
+      font-size: 36px;
+      margin-bottom: 12px;
+    }
+    .login-card h2 {
+      font-size: 18px;
+      font-weight: 750;
+      color: var(--color-primary-dark);
+      margin-bottom: 6px;
+    }
+    .login-card p {
+      font-size: 13px;
+      color: var(--color-text-sub);
+      margin-bottom: 20px;
+    }
+    .login-card input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1.5px solid var(--color-border);
+      border-radius: 10px;
+      font-size: 16px;
+      font-family: inherit;
+      margin-bottom: 12px;
+      -webkit-appearance: none;
+    }
+    .login-card input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+    .login-card button {
+      width: 100%;
+      padding: 13px;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .login-card .login-error {
+      color: var(--color-error);
+      font-size: 12.5px;
+      margin-top: 10px;
+      min-height: 16px;
+    }
+
+    /* Main Screen */
+    .main-screen { display: none; }
+    .main-screen.show { display: block; }
+
+    /* Card */
+    .card {
+      background: var(--color-card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px 20px;
+      margin-bottom: 14px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 750;
+      color: var(--color-primary-dark);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title .icon { font-size: 18px; }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .stat-card {
+      background: var(--color-card);
+      border: 1.5px solid var(--color-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .stat-card.highlight {
+      background: var(--color-primary-light);
+      border-color: var(--color-primary);
+    }
+    .stat-card .label {
+      font-size: 11.5px;
+      color: var(--color-text-sub);
+      font-weight: 600;
+      letter-spacing: -0.2px;
+    }
+    .stat-card .count {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      margin-top: 2px;
+      letter-spacing: -0.5px;
+    }
+    .stat-card .revenue {
+      font-size: 12.5px;
+      color: var(--color-text-sub);
+      font-weight: 600;
+      margin-top: 1px;
+    }
+    .stat-card .sub {
+      font-size: 11px;
+      color: var(--color-success);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .alert-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .alert-pill {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 12.5px;
+      font-weight: 700;
+      border: 1.5px solid;
+    }
+    .alert-pill.warn {
+      background: #FFFBEB;
+      border-color: #F59E0B;
+      color: #B45309;
+    }
+    .alert-pill.info {
+      background: #EFF6FF;
+      border-color: #3B82F6;
+      color: #1D4ED8;
+    }
+    .alert-pill .num {
+      font-size: 16px;
+      display: block;
+      margin-bottom: 2px;
+      font-weight: 800;
+    }
+
+    /* Daily chart */
+    .daily-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 90px;
+      padding: 4px 0 22px;
+      position: relative;
+      border-bottom: 1.5px solid var(--color-border);
+    }
+    .daily-bar {
+      flex: 1;
+      background: var(--color-primary-light);
+      border-radius: 4px 4px 0 0;
+      position: relative;
+      min-height: 2px;
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+    .daily-bar.active { background: var(--color-primary); }
+    .daily-bar .day-label {
+      position: absolute;
+      bottom: -20px;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 10.5px;
+      color: var(--color-text-sub);
+      font-weight: 600;
+    }
+    .daily-bar .day-label.today { color: var(--color-primary); font-weight: 800; }
+    .daily-bar .tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-4px);
+      background: var(--color-text);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .daily-bar:hover .tooltip { opacity: 1; }
+
+    /* Top products */
+    .top-product {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #F3F4F6;
+      font-size: 13px;
+    }
+    .top-product:last-child { border-bottom: none; }
+    .top-product .rank {
+      width: 22px;
+      height: 22px;
+      background: var(--color-primary-light);
+      color: var(--color-primary-dark);
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .top-product .rank.gold { background: #FEF3C7; color: #B45309; }
+    .top-product .name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+    .top-product .count {
+      font-size: 12px;
+      color: var(--color-text-sub);
+      font-weight: 600;
+    }
+    .top-product .revenue {
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      min-width: 80px;
+      text-align: right;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--color-text-sub);
+      font-size: 13px;
+      padding: 24px 0;
+    }
+
+    .refresh-btn {
+      background: transparent;
+      border: 1px solid var(--color-border);
+      color: var(--color-text-sub);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      cursor: pointer;
+      font-family: inherit;
+      margin-left: auto;
+    }
+    .refresh-btn:active { background: #F3F4F6; }
+
+    /* Settings fields */
+    .field {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #F3F4F6;
+    }
+    .field:last-child { border-bottom: none; }
+    .field label {
+      font-size: 13px;
+      color: var(--color-text-sub);
+      font-weight: 600;
+    }
+    .field input {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1.5px solid var(--color-border);
+      border-radius: 8px;
+      font-size: 14.5px;
+      font-family: inherit;
+      background: white;
+      -webkit-appearance: none;
+    }
+    .field input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+    .field input.changed {
+      border-color: var(--color-accent);
+      background: #FFF8F2;
+    }
+
+    /* Products list */
+    .product-row {
+      display: grid;
+      grid-template-columns: 1fr 90px 50px 32px;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #F3F4F6;
+    }
+    .product-row:last-child { border-bottom: none; }
+    .product-row input[type="text"],
+    .product-row input[type="number"] {
+      padding: 9px 10px;
+      border: 1.5px solid var(--color-border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      width: 100%;
+      -webkit-appearance: none;
+    }
+    .product-row input[type="number"] {
+      text-align: right;
+    }
+    .product-row input.changed {
+      border-color: var(--color-accent);
+      background: #FFF8F2;
+    }
+    .product-row .toggle {
+      display: flex;
+      justify-content: center;
+    }
+    .product-row .toggle input {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--color-primary);
+      cursor: pointer;
+    }
+    .product-row .delete-btn {
+      width: 32px;
+      height: 32px;
+      background: var(--color-danger-bg);
+      color: var(--color-error);
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .product-row .delete-btn:active {
+      transform: scale(0.92);
+    }
+    .product-header {
+      display: grid;
+      grid-template-columns: 1fr 90px 50px 32px;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1.5px solid var(--color-primary-light);
+      font-size: 12px;
+      color: var(--color-text-sub);
+      font-weight: 600;
+    }
+    .product-header .col-toggle,
+    .product-header .col-action {
+      text-align: center;
+    }
+
+    .add-btn {
+      width: 100%;
+      padding: 12px;
+      background: white;
+      border: 1.5px dashed var(--color-primary);
+      color: var(--color-primary);
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 12px;
+    }
+    .add-btn:active {
+      background: var(--color-primary-light);
+    }
+
+    /* Bottom action bar */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid var(--color-border);
+      padding: 14px 16px;
+      z-index: 100;
+      display: none;
+    }
+    .bottom-bar.show { display: block; }
+    .bottom-bar .inner {
+      max-width: 520px;
+      margin: 0 auto;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .bottom-bar .status-text {
+      flex: 1;
+      font-size: 12.5px;
+      color: var(--color-accent);
+      font-weight: 600;
+    }
+    .save-btn {
+      padding: 12px 22px;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      min-width: 110px;
+    }
+    .save-btn:disabled {
+      background: #D1D5DB;
+      cursor: not-allowed;
+    }
+    .save-btn.loading {
+      color: transparent;
+      position: relative;
+    }
+    .save-btn.loading::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      top: 50%; left: 50%;
+      margin: -9px 0 0 -9px;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--color-border);
+      color: var(--color-text-sub);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      margin-left: auto;
+      display: block;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-80px);
+      background: var(--color-text);
+      color: white;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 200;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast.success { background: var(--color-success); }
+    .toast.error { background: var(--color-error); }
+
+    /* Responsive */
+    @media (max-width: 380px) {
+      .container { padding: 0 12px; }
+      .card { padding: 18px 16px; }
+      .field { grid-template-columns: 90px 1fr; gap: 8px; }
+      .product-row, .product-header {
+        grid-template-columns: 1fr 80px 44px 28px;
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="lock-icon">🔐</div>
+    <h2>관리자 로그인</h2>
+    <p>비밀번호를 입력해주세요</p>
+    <input type="password" id="pwInput" placeholder="비밀번호" autocomplete="current-password"
+           onkeydown="if(event.key==='Enter') login()">
+    <button onclick="login()">로그인</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- MAIN SCREEN -->
+<div class="main-screen" id="mainScreen">
+  <div class="container">
+    <div class="header">
+      <h1>⚙️ 주문폼 관리자</h1>
+      <p class="subtitle">상품·계좌·가게 설정 편집</p>
+      <a href="order-form.html" class="preview-link" target="_blank">📱 주문폼 미리보기</a>
+      <button class="logout-btn" onclick="logout()">로그아웃</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="card" id="statsCard">
+      <div class="card-title">
+        <span class="icon">📊</span> 주문 통계
+        <button class="refresh-btn" onclick="loadStats()">🔄 새로고침</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card highlight">
+          <div class="label">오늘</div>
+          <div class="count" id="statTodayCount">-</div>
+          <div class="revenue" id="statTodayRevenue">-</div>
+          <div class="sub" id="statTodayConfirmed"></div>
+        </div>
+        <div class="stat-card">
+          <div class="label">이번 주</div>
+          <div class="count" id="statWeekCount">-</div>
+          <div class="revenue" id="statWeekRevenue">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">이번 달</div>
+          <div class="count" id="statMonthCount">-</div>
+          <div class="revenue" id="statMonthRevenue">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">전체 누적</div>
+          <div class="count" id="statAllCount">-</div>
+          <div class="revenue" id="statAllRevenue">-</div>
+        </div>
+      </div>
+
+      <div class="alert-bar">
+        <div class="alert-pill warn">
+          <span class="num" id="statUnconfirmed">-</span>
+          입금 미확인
+        </div>
+        <div class="alert-pill info">
+          <span class="num" id="statAwaiting">-</span>
+          발송 대기
+        </div>
+      </div>
+
+      <div style="margin-top:18px;">
+        <div style="font-size:12.5px; color:var(--color-text-sub); font-weight:600; margin-bottom:8px;">
+          📈 최근 7일 주문 추이
+        </div>
+        <div class="daily-chart" id="dailyChart"></div>
+      </div>
+
+      <div style="margin-top:18px;">
+        <div style="font-size:12.5px; color:var(--color-text-sub); font-weight:600; margin-bottom:8px;">
+          🏆 상품별 매출 (확인완료 기준)
+        </div>
+        <div id="topProducts"></div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="card">
+      <div class="card-title"><span class="icon">⚙️</span> 가게 설정</div>
+      <div id="settingsContainer"></div>
+    </div>
+
+    <!-- Products -->
+    <div class="card">
+      <div class="card-title"><span class="icon">📦</span> 상품 목록</div>
+      <div class="product-header">
+        <div>상품명</div>
+        <div style="text-align:right;">가격</div>
+        <div class="col-toggle">판매중</div>
+        <div class="col-action"></div>
+      </div>
+      <div id="productsContainer"></div>
+      <button class="add-btn" onclick="addProduct()">＋ 상품 추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Bar -->
+<div class="bottom-bar" id="bottomBar">
+  <div class="inner">
+    <div class="status-text" id="statusText">변경사항 있음</div>
+    <button class="save-btn" id="saveBtn" onclick="saveAll()">💾 모두 저장</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================
+   ⚙️ CONFIG: scriptUrl만 설정
+   ============================================ */
+const CONFIG = {
+  scriptUrl: "https://script.google.com/macros/s/AKfycbx_UczNFBjwXLVb5ahgkQHFNoWo-LPCcKJLAqbh6k9TVRg03KFW0W7WR3mhbTQSyt91/exec"
+};
+
+// 설정 항목 정의 (순서 = 표시 순서, key = 시트의 A열 키와 일치)
+const SETTING_FIELDS = [
+  { key: '가게 이름',      type: 'text',   placeholder: '예: 배플루언서' },
+  { key: '헤더 이모지',    type: 'text',   placeholder: '🍓' },
+  { key: '은행 이름',      type: 'text',   placeholder: '농협' },
+  { key: '계좌번호',       type: 'text',   placeholder: '123-4567-8901-23' },
+  { key: '예금주',         type: 'text',   placeholder: '홍길동' },
+  { key: '최대 주문 수량', type: 'number', placeholder: '10' },
+  { key: '발송지 주소',    type: 'text',   placeholder: '광주광역시 OO구 OO로 123' }
+];
+
+/* ============================================
+   상태 관리
+   ============================================ */
+let password = '';
+let originalSettings = {};
+let originalProducts = [];
+let currentSettings = {};
+let currentProducts = [];
+let isDirty = false;
+
+/* ============================================
+   로그인
+   ============================================ */
+async function login() {
+  const pw = document.getElementById('pwInput').value.trim();
+  const errorEl = document.getElementById('loginError');
+  errorEl.textContent = '';
+
+  if (!pw) {
+    errorEl.textContent = '비밀번호를 입력해주세요';
+    return;
+  }
+  if (!CONFIG.scriptUrl || CONFIG.scriptUrl === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+    errorEl.textContent = 'scriptUrl이 설정되지 않았습니다. admin.html 상단의 CONFIG.scriptUrl을 입력해주세요.';
+    return;
+  }
+
+  try {
+    const r = await fetch(`${CONFIG.scriptUrl}?action=getAdminConfig&pw=${encodeURIComponent(pw)}`);
+    if (!r.ok) throw new Error('서버 오류 ' + r.status);
+    const data = await r.json();
+
+    if (data.error) {
+      errorEl.textContent = data.error === 'Unauthorized'
+        ? '비밀번호가 틀렸습니다'
+        : '오류: ' + data.error;
+      return;
+    }
+
+    // 로그인 성공
+    password = pw;
+    localStorage.setItem('admin_pw', pw);
+    showMain(data);
+  } catch (err) {
+    errorEl.textContent = '연결 오류: ' + err.message;
+  }
+}
+
+function logout() {
+  if (isDirty && !confirm('저장되지 않은 변경사항이 있습니다. 정말 로그아웃하시겠습니까?')) {
+    return;
+  }
+  localStorage.removeItem('admin_pw');
+  password = '';
+  document.getElementById('mainScreen').classList.remove('show');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('pwInput').value = '';
+}
+
+/* ============================================
+   메인 화면 표시
+   ============================================ */
+function showMain(data) {
+  originalSettings = { ...data.settings };
+  originalProducts = JSON.parse(JSON.stringify(data.products));
+  currentSettings = { ...data.settings };
+  currentProducts = JSON.parse(JSON.stringify(data.products));
+
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('mainScreen').classList.add('show');
+
+  renderSettings();
+  renderProducts();
+  updateDirty();
+  loadStats();
+}
+
+/* ============================================
+   통계 로드 + 렌더
+   ============================================ */
+async function loadStats() {
+  try {
+    const r = await fetch(`${CONFIG.scriptUrl}?action=getOrderStats&pw=${encodeURIComponent(password)}`);
+    if (!r.ok) throw new Error('서버 ' + r.status);
+    const stats = await r.json();
+    if (stats.error) throw new Error(stats.error);
+    renderStats(stats);
+  } catch (err) {
+    console.warn('통계 로드 실패:', err);
+    showToast('통계 로드 실패: ' + err.message, 'error');
+  }
+}
+
+function renderStats(stats) {
+  const fmt = n => (Number(n) || 0).toLocaleString();
+  const won = n => fmt(n) + '원';
+
+  // 요약
+  document.getElementById('statTodayCount').textContent = stats.summary.today.count + '건';
+  document.getElementById('statTodayRevenue').textContent = won(stats.summary.today.revenue);
+  const todayConfirmed = stats.summary.today.confirmed;
+  const todayPending = stats.summary.today.count - todayConfirmed;
+  document.getElementById('statTodayConfirmed').textContent =
+    todayConfirmed > 0 || todayPending > 0
+      ? `확인 ${todayConfirmed} · 대기 ${todayPending}`
+      : '';
+
+  document.getElementById('statWeekCount').textContent = stats.summary.week.count + '건';
+  document.getElementById('statWeekRevenue').textContent = won(stats.summary.week.revenue);
+  document.getElementById('statMonthCount').textContent = stats.summary.month.count + '건';
+  document.getElementById('statMonthRevenue').textContent = won(stats.summary.month.revenue);
+  document.getElementById('statAllCount').textContent = stats.summary.all.count + '건';
+  document.getElementById('statAllRevenue').textContent = won(stats.summary.all.revenue);
+
+  document.getElementById('statUnconfirmed').textContent = stats.pending.unconfirmed;
+  document.getElementById('statAwaiting').textContent = stats.pending.awaitingShipping;
+
+  // 일자별 차트
+  const chart = document.getElementById('dailyChart');
+  chart.innerHTML = '';
+  const maxRevenue = Math.max(...stats.daily.map(d => d.revenue), 1);
+  const todayKey = new Date().toISOString().slice(0, 10);
+  stats.daily.forEach(d => {
+    const bar = document.createElement('div');
+    const heightPct = (d.revenue / maxRevenue) * 100;
+    bar.className = 'daily-bar' + (d.count > 0 ? ' active' : '');
+    bar.style.height = Math.max(heightPct, 3) + '%';
+    const dayShort = d.date.slice(8, 10);  // DD
+    const isToday = d.date === todayKey;
+    bar.innerHTML = `
+      <div class="tooltip">${d.date.slice(5)} · ${d.count}건 · ${won(d.revenue)}</div>
+      <div class="day-label${isToday ? ' today' : ''}">${dayShort}</div>
+    `;
+    chart.appendChild(bar);
+  });
+
+  // 상품별 매출
+  const topContainer = document.getElementById('topProducts');
+  topContainer.innerHTML = '';
+  if (stats.topProducts.length === 0) {
+    topContainer.innerHTML = '<div class="empty-state">아직 확인완료된 주문이 없습니다</div>';
+  } else {
+    stats.topProducts.forEach((p, i) => {
+      const row = document.createElement('div');
+      row.className = 'top-product';
+      row.innerHTML = `
+        <div class="rank ${i < 3 ? 'gold' : ''}">${i + 1}</div>
+        <div class="name">${escapeAttr(p.name)}</div>
+        <div class="count">${p.count}개</div>
+        <div class="revenue">${won(p.revenue)}</div>
+      `;
+      topContainer.appendChild(row);
+    });
+  }
+}
+
+/* ============================================
+   설정 렌더링
+   ============================================ */
+function renderSettings() {
+  const container = document.getElementById('settingsContainer');
+  container.innerHTML = '';
+
+  SETTING_FIELDS.forEach(field => {
+    const div = document.createElement('div');
+    div.className = 'field';
+    const value = currentSettings[field.key] !== undefined ? currentSettings[field.key] : '';
+    div.innerHTML = `
+      <label>${field.key}</label>
+      <input type="${field.type}" data-key="${field.key}"
+             placeholder="${field.placeholder}" value="${escapeAttr(value)}">
+    `;
+    const input = div.querySelector('input');
+    input.addEventListener('input', () => {
+      const v = field.type === 'number' ? Number(input.value) || 0 : input.value;
+      currentSettings[field.key] = v;
+      input.classList.toggle('changed', String(v) !== String(originalSettings[field.key] || ''));
+      updateDirty();
+    });
+    container.appendChild(div);
+  });
+}
+
+/* ============================================
+   상품 렌더링
+   ============================================ */
+function renderProducts() {
+  const container = document.getElementById('productsContainer');
+  container.innerHTML = '';
+
+  currentProducts.forEach((product, i) => {
+    const row = document.createElement('div');
+    row.className = 'product-row';
+    row.innerHTML = `
+      <input type="text" data-field="name" placeholder="상품명" value="${escapeAttr(product.name)}">
+      <input type="number" data-field="price" placeholder="0" value="${product.price || 0}">
+      <div class="toggle">
+        <input type="checkbox" data-field="active" ${product.active !== false ? 'checked' : ''}>
+      </div>
+      <button class="delete-btn" title="삭제">🗑</button>
+    `;
+
+    const nameInput = row.querySelector('[data-field="name"]');
+    const priceInput = row.querySelector('[data-field="price"]');
+    const activeInput = row.querySelector('[data-field="active"]');
+    const deleteBtn = row.querySelector('.delete-btn');
+
+    nameInput.addEventListener('input', () => {
+      currentProducts[i].name = nameInput.value;
+      markChanged(nameInput, i, 'name');
+      updateDirty();
+    });
+    priceInput.addEventListener('input', () => {
+      currentProducts[i].price = Number(priceInput.value) || 0;
+      markChanged(priceInput, i, 'price');
+      updateDirty();
+    });
+    activeInput.addEventListener('change', () => {
+      currentProducts[i].active = activeInput.checked;
+      updateDirty();
+    });
+    deleteBtn.addEventListener('click', () => {
+      if (!confirm(`"${product.name || '(이름 없음)'}" 상품을 삭제하시겠습니까?`)) return;
+      currentProducts.splice(i, 1);
+      renderProducts();
+      updateDirty();
+    });
+
+    container.appendChild(row);
+  });
+}
+
+function markChanged(input, idx, field) {
+  const orig = originalProducts[idx];
+  const changed = !orig || String(currentProducts[idx][field]) !== String(orig[field]);
+  input.classList.toggle('changed', changed);
+}
+
+function addProduct() {
+  currentProducts.push({ name: '', price: 0, active: true });
+  renderProducts();
+  updateDirty();
+  // 새로 추가된 상품의 이름 칸으로 포커스
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('#productsContainer .product-row input[data-field="name"]');
+    inputs[inputs.length - 1]?.focus();
+  }, 50);
+}
+
+/* ============================================
+   변경사항 감지 + 저장
+   ============================================ */
+function updateDirty() {
+  isDirty = JSON.stringify(currentSettings) !== JSON.stringify(originalSettings)
+    || JSON.stringify(currentProducts) !== JSON.stringify(originalProducts);
+  document.getElementById('bottomBar').classList.toggle('show', isDirty);
+}
+
+async function saveAll() {
+  // 빈 상품명 검증
+  const invalidProducts = currentProducts.filter(p => !String(p.name || '').trim());
+  if (invalidProducts.length > 0) {
+    showToast('상품명이 비어있는 행이 있습니다', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+
+  try {
+    const response = await fetch(CONFIG.scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'updateConfig',
+        pw: password,
+        settings: currentSettings,
+        products: currentProducts
+      })
+    });
+
+    if (!response.ok) throw new Error('서버 응답 ' + response.status);
+    const result = await response.json();
+    if (!result.success) throw new Error(result.error || '저장 실패');
+
+    // 성공 → 원본 갱신, dirty 해제
+    originalSettings = { ...currentSettings };
+    originalProducts = JSON.parse(JSON.stringify(currentProducts));
+    isDirty = false;
+    document.getElementById('bottomBar').classList.remove('show');
+
+    // 변경 표시 클리어
+    document.querySelectorAll('.changed').forEach(el => el.classList.remove('changed'));
+
+    showToast('✅ 저장되었습니다', 'success');
+  } catch (err) {
+    showToast('❌ ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+/* ============================================
+   유틸
+   ============================================ */
+function escapeAttr(str) {
+  return String(str || '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+function showToast(msg, type) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast ' + (type || '') + ' show';
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+/* ============================================
+   페이지 로드 시 자동 로그인 시도
+   ============================================ */
+async function autoLogin() {
+  const savedPw = localStorage.getItem('admin_pw');
+  if (!savedPw) return;
+  document.getElementById('pwInput').value = savedPw;
+  await login();
+}
+
+// 페이지 떠날 때 dirty 경고
+window.addEventListener('beforeunload', (e) => {
+  if (isDirty) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+document.addEventListener('DOMContentLoaded', autoLogin);
+</script>
+
+</body>
+</html>
