@@ -51,12 +51,21 @@
       padding: 32px 0 24px;
       position: relative;
     }
-    .header::before {
-      content: '🍓';
+    .header-emoji {
       font-size: 40px;
       display: block;
       margin-bottom: 8px;
       animation: bounce 2s ease-in-out infinite;
+    }
+    .header-video {
+      display: block;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      background: #000;
     }
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
@@ -310,21 +319,50 @@
       transform: scale(0.97);
     }
 
-    /* Checkbox */
+    /* Checkbox - 커스텀 스타일 (모바일에서도 체크 표시 명확) */
     .checkbox-row {
       display: flex;
       align-items: flex-start;
       gap: 10px;
       margin-top: 8px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
     .checkbox-row input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      margin-top: 2px;
-      accent-color: var(--color-primary);
-      flex-shrink: 0;
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
     }
-    .checkbox-row span {
+    .checkbox-row .check-box {
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--color-border);
+      border-radius: 6px;
+      flex-shrink: 0;
+      background: white;
+      margin-top: 1px;
+      position: relative;
+      transition: all 0.15s;
+    }
+    .checkbox-row input[type="checkbox"]:checked ~ .check-box {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+    .checkbox-row input[type="checkbox"]:checked ~ .check-box::after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 1px;
+      width: 7px;
+      height: 12px;
+      border: solid white;
+      border-width: 0 2.5px 2.5px 0;
+      transform: rotate(45deg);
+    }
+    .checkbox-row .check-text {
       font-size: 13px;
       color: var(--color-text-sub);
       line-height: 1.5;
@@ -446,6 +484,36 @@
       flex-shrink: 0;
     }
     .success-bank .copy-btn:active { transform: scale(0.95); }
+    .success-cta {
+      margin: 32px auto 0;
+      max-width: 340px;
+      padding: 18px 16px;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.7;
+      text-align: center;
+      letter-spacing: -0.3px;
+      background: linear-gradient(
+        90deg,
+        #DC2626 0%,
+        #DC2626 30%,
+        #FFD700 45%,
+        #FFFFFF 50%,
+        #FFD700 55%,
+        #DC2626 70%,
+        #DC2626 100%
+      );
+      background-size: 300% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+      animation: ctaShimmer 3s linear infinite;
+    }
+    @keyframes ctaShimmer {
+      0%   { background-position: 300% center; }
+      100% { background-position: -300% center; }
+    }
     .success-bank .info { flex: 1; text-align: left; }
     .success-bank .holder {
       font-size: 11.5px;
@@ -623,6 +691,9 @@
   </div>
 
   <div class="header" id="shopHeader" style="display:none;">
+    <video class="header-video" autoplay loop muted playsinline preload="auto">
+      <source src="header.mp4" type="video/mp4">
+    </video>
     <h1 id="shopTitle"></h1>
     <p class="subtitle">신선한 과일을 산지에서 직접 배송합니다</p>
   </div>
@@ -688,10 +759,11 @@
     <!-- Sender Info -->
     <div class="card">
       <div class="card-title"><span class="icon">🎁</span> 보내는 분 정보</div>
-      <div class="checkbox-row" style="margin-top:0; margin-bottom:14px;">
+      <label class="checkbox-row" style="margin-top:0; margin-bottom:14px;">
         <input type="checkbox" id="sameAsOrderer" onchange="toggleSender()">
-        <span style="font-size:14px; font-weight:600; color:var(--color-text);">주문자와 동일</span>
-      </div>
+        <span class="check-box"></span>
+        <span class="check-text" style="font-size:14px; font-weight:600; color:var(--color-text);">주문자와 동일</span>
+      </label>
       <div id="senderFields">
         <div class="field">
           <label>보내는 분 이름 <span class="required">*</span></label>
@@ -732,10 +804,11 @@
 
     <!-- Agreement + Submit -->
     <div class="card">
-      <div class="checkbox-row">
+      <label class="checkbox-row">
         <input type="checkbox" id="agree">
-        <span>주문 내용을 확인하였으며, 개인정보 수집·이용에 동의합니다.</span>
-      </div>
+        <span class="check-box"></span>
+        <span class="check-text">주문 내용을 확인하였으며, 개인정보 수집·이용에 동의합니다.</span>
+      </label>
     </div>
 
     <button class="submit-btn" id="submitBtn" onclick="submitOrder()">
@@ -769,6 +842,10 @@
       <button class="copy-btn" onclick="copyAccount()">복사</button>
     </div>
     <p style="margin-top:18px;">입금 확인 후 순차적으로 발송됩니다.</p>
+    <div class="success-cta">
+      @배플루언서 유튜브, 인스타그램, 틱톡<br>
+      팔로우하고 라이브방송 놓치지 마세요!
+    </div>
   </div>
 </div>
 
@@ -833,6 +910,7 @@ async function loadConfig() {
 function renderShop() {
   document.getElementById('shopTitle').textContent = SHOP.shopName;
   document.title = `주문하기 - ${SHOP.shopName}`;
+  document.getElementById('headerEmoji').textContent = SHOP.headerEmoji || '🍐';
 
   document.getElementById('bankDisplay').textContent =
     `${SHOP.bank.name} ${SHOP.bank.account}`;
