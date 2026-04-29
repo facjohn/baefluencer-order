@@ -521,6 +521,56 @@
     /* Hide form when success */
     .form-wrap.hidden { display: none; }
 
+    /* Loading screen */
+    .loading-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 70vh;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .loading-screen.hidden { display: none; }
+    .loading-screen .brand {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      margin-bottom: 28px;
+      background: linear-gradient(
+        90deg,
+        var(--color-primary-dark) 0%,
+        var(--color-primary) 25%,
+        #FFD54F 50%,
+        var(--color-primary) 75%,
+        var(--color-primary-dark) 100%
+      );
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+      animation: shimmer 2.5s linear infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 200% center; }
+      100% { background-position: -200% center; }
+    }
+    .loading-screen .spinner {
+      width: 44px;
+      height: 44px;
+      border: 3px solid var(--color-primary-light);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 20px;
+    }
+    .loading-screen p {
+      color: var(--color-text-sub);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
     /* Daum Postcode Layer */
     .postcode-overlay {
       display: none;
@@ -565,13 +615,20 @@
 <body>
 
 <div class="container">
-  <div class="header">
-    <h1 id="shopTitle">배플루언서</h1>
+  <!-- LOADING SCREEN -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="brand">배플루언서</div>
+    <div class="spinner"></div>
+    <p>잠시만 기다려 주세요...</p>
+  </div>
+
+  <div class="header" id="shopHeader" style="display:none;">
+    <h1 id="shopTitle"></h1>
     <p class="subtitle">신선한 과일을 산지에서 직접 배송합니다</p>
   </div>
 
   <!-- ORDER FORM -->
-  <div class="form-wrap" id="formWrap">
+  <div class="form-wrap hidden" id="formWrap">
     <!-- Bank Info Notice -->
     <div class="notice">
       <strong>💰 주문 후 아래 계좌로 입금해주세요</strong>
@@ -748,6 +805,10 @@ async function init() {
   await loadConfig();
   renderShop();
   bindSenderSync();
+  // 로딩 끝 → 헤더 + 폼 표시
+  document.getElementById('loadingScreen').classList.add('hidden');
+  document.getElementById('shopHeader').style.display = '';
+  document.getElementById('formWrap').classList.remove('hidden');
 }
 
 async function loadConfig() {
