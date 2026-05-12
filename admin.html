@@ -457,25 +457,25 @@
     .product-row .delete-btn:active {
       transform: scale(0.92);
     }
-    .product-row-image {
+    .product-row-extra {
       margin-top: 6px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .product-row-image .image-label {
+    .product-row-extra .extra-label {
       font-size: 11.5px;
       color: var(--color-text-sub);
       font-weight: 600;
       flex-shrink: 0;
       width: 56px;
     }
-    .product-row-image input {
+    .product-row-extra input {
       flex: 1;
       font-size: 12.5px !important;
       padding: 7px 10px !important;
     }
-    .product-row-image .image-preview {
+    .product-row-extra .image-preview {
       width: 32px;
       height: 32px;
       border-radius: 6px;
@@ -750,9 +750,11 @@
       </div>
       <div id="productsContainer"></div>
       <button class="add-btn" onclick="addProduct()">＋ 상품 추가</button>
-      <div style="margin-top:10px; font-size:11.5px; color:var(--color-text-sub); line-height:1.5;">
+      <div style="margin-top:10px; font-size:11.5px; color:var(--color-text-sub); line-height:1.6;">
         💡 <strong>재고</strong>: 비우면 무제한, 숫자 입력 시 주문마다 자동 차감 (5개 이하면 폼에서 "🔥 마지막 N개" 표시)<br>
-        💡 <strong>이미지</strong>: 인스타 게시물 등 외부 URL 붙여넣기 (선택, 비어도 정상)
+        💡 <strong>브랜드</strong>: 카드 상단에 작게 표시 (예: "배플루언서 농가직송")<br>
+        💡 <strong>설명</strong>: 상품 상세 페이지에 표시되는 한 줄 (예: "당도 14브릭스 이상")<br>
+        💡 <strong>이미지</strong>: 인스타 게시물 등 외부 URL 붙여넣기 (모두 선택, 비어도 정상)
       </div>
     </div>
   </div>
@@ -1002,9 +1004,19 @@ function renderProducts() {
         </div>
         <button class="delete-btn" title="삭제">🗑</button>
       </div>
-      <div class="product-row-image">
-        <span class="image-label">🖼 이미지</span>
-        <input type="url" data-field="imageUrl" placeholder="https://... (선택)"
+      <div class="product-row-extra">
+        <span class="extra-label">🏷 브랜드</span>
+        <input type="text" data-field="brand" placeholder="예: 배플루언서 농가직송 (선택)"
+               value="${escapeAttr(product.brand || '')}">
+      </div>
+      <div class="product-row-extra">
+        <span class="extra-label">📝 설명</span>
+        <input type="text" data-field="description" placeholder="상세 페이지에 표시될 한 줄 설명 (선택)"
+               value="${escapeAttr(product.description || '')}">
+      </div>
+      <div class="product-row-extra">
+        <span class="extra-label">🖼 이미지</span>
+        <input type="url" data-field="imageUrl" placeholder="https://... 인스타 이미지 URL (선택)"
                value="${escapeAttr(product.imageUrl || '')}">
         ${product.imageUrl
           ? `<img class="image-preview" src="${escapeAttr(product.imageUrl)}" alt="" onerror="this.style.display='none'">`
@@ -1017,6 +1029,8 @@ function renderProducts() {
     const stockInput = row.querySelector('[data-field="stock"]');
     const activeInput = row.querySelector('[data-field="active"]');
     const imageInput = row.querySelector('[data-field="imageUrl"]');
+    const brandInput = row.querySelector('[data-field="brand"]');
+    const descInput = row.querySelector('[data-field="description"]');
     const deleteBtn = row.querySelector('.delete-btn');
 
     nameInput.addEventListener('input', () => {
@@ -1033,7 +1047,6 @@ function renderProducts() {
       const v = stockInput.value;
       currentProducts[i].stock = (v === '' ? null : Number(v));
       markChanged(stockInput, i, 'stock');
-      // 즉시 low-stock 스타일 갱신
       const s = currentProducts[i].stock;
       stockInput.classList.toggle('low-stock', s !== null && s <= 5);
       updateLowStockBanner();
@@ -1047,6 +1060,16 @@ function renderProducts() {
     imageInput.addEventListener('input', () => {
       currentProducts[i].imageUrl = imageInput.value;
       markChanged(imageInput, i, 'imageUrl');
+      updateDirty();
+    });
+    brandInput.addEventListener('input', () => {
+      currentProducts[i].brand = brandInput.value;
+      markChanged(brandInput, i, 'brand');
+      updateDirty();
+    });
+    descInput.addEventListener('input', () => {
+      currentProducts[i].description = descInput.value;
+      markChanged(descInput, i, 'description');
       updateDirty();
     });
     deleteBtn.addEventListener('click', () => {
@@ -1090,7 +1113,10 @@ function markChanged(input, idx, field) {
 }
 
 function addProduct() {
-  currentProducts.push({ name: '', price: 0, active: true, stock: null, imageUrl: '' });
+  currentProducts.push({
+    name: '', price: 0, active: true, stock: null,
+    imageUrl: '', brand: '', description: ''
+  });
   renderProducts();
   updateDirty();
   setTimeout(() => {

@@ -12,20 +12,24 @@
        CONFIG: 여기서 색상/브랜드 수정 가능
        ============================================ */
     :root {
-      --color-primary: #1B6B2A;
-      --color-primary-light: #E8F5E9;
-      --color-primary-dark: #0D4A1A;
-      --color-accent: #E8722A;
+      /* ─── Coupang 스타일 컬러 시스템 ─── */
+      --color-primary: #346AFF;        /* 쿠팡 파랑 — 모든 CTA/버튼/링크 */
+      --color-primary-light: #EBF1FF;  /* 연한 파랑 배경 */
+      --color-primary-dark: #1858D6;   /* 진한 파랑 텍스트 */
+      --color-price: #DC2D2D;          /* 쿠팡 빨강 — 가격/할인% 전용 */
+      --color-price-light: #FFEBEB;
+      --color-accent: #E8722A;         /* 주황 — 입금 긴급 알림(성공화면) */
       --color-accent-light: #FFF3EC;
-      --color-bg: #FAFAF5;
+      --color-bg: #FFFFFF;             /* 순백 배경 */
       --color-card: #FFFFFF;
-      --color-text: #1A1A1A;
-      --color-text-sub: #6B7280;
-      --color-border: #E5E7EB;
+      --color-text: #111827;
+      --color-text-sub: #767676;       /* 쿠팡 회색 */
+      --color-border: #ECECEC;         /* 연한 보더 */
+      --color-border-light: #F5F5F5;
       --color-error: #DC2626;
       --color-success: #16A34A;
-      --radius: 14px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+      --radius: 10px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.03);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -75,7 +79,7 @@
     .header h1 {
       font-size: 22px;
       font-weight: 800;
-      color: var(--color-primary-dark);
+      color: var(--color-text);
       letter-spacing: -0.5px;
     }
     .header .subtitle {
@@ -87,7 +91,7 @@
     /* Notice Banner */
     .notice {
       background: var(--color-primary-light);
-      border: 1px solid rgba(27,107,42,0.15);
+      border: 1px solid #C8DCFF;
       border-radius: var(--radius);
       padding: 14px 16px;
       margin-bottom: 20px;
@@ -133,12 +137,13 @@
     }
     .card-title {
       font-size: 15px;
-      font-weight: 750;
-      color: var(--color-primary-dark);
+      font-weight: 800;
+      color: var(--color-text);
       margin-bottom: 16px;
       display: flex;
       align-items: center;
       gap: 8px;
+      letter-spacing: -0.3px;
     }
     .card-title .icon {
       font-size: 18px;
@@ -198,7 +203,341 @@
       height: 70px;
     }
 
-    /* Product Selection */
+    /* ─────────── 마켓 그리드 ─────────── */
+    .view-market, .view-detail, .view-form { display: block; }
+    .view-market.hidden, .view-detail.hidden, .view-form.hidden { display: none; }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 10px;
+      margin-bottom: 12px;
+    }
+    .product-card {
+      cursor: pointer;
+      border-radius: 12px;
+      transition: transform 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .product-card:active { transform: scale(0.97); }
+    .product-card.sold-out { opacity: 0.55; cursor: not-allowed; }
+    .product-card-image {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      background: linear-gradient(135deg, #FFE0E6, #FFC4CD);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .product-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .product-card-image .fallback-emoji {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+    }
+    .product-card .card-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      color: white;
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 4px 9px;
+      border-radius: 6px;
+      letter-spacing: -0.2px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    }
+    .product-card .card-badge.sold-out-badge { background: #6B7280; }
+    .product-card .card-badge.low-stock-badge {
+      background: var(--color-error);
+      animation: cardBadgePulse 1.5s ease-in-out infinite;
+    }
+    @keyframes cardBadgePulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 2px 6px rgba(220,38,38,0.4); }
+      50%      { transform: scale(1.08); box-shadow: 0 4px 14px rgba(220,38,38,0.6); }
+    }
+    .product-card-body { padding: 0 2px; }
+    .product-card-body .brand {
+      font-size: 10.5px;
+      color: var(--color-text-sub);
+      font-weight: 600;
+      margin-bottom: 2px;
+      line-height: 1.2;
+      letter-spacing: -0.1px;
+    }
+    .product-card-body .name {
+      font-size: 13.5px;
+      color: var(--color-text);
+      font-weight: 600;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      letter-spacing: -0.2px;
+    }
+    .product-card-body .price {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--color-price);
+      letter-spacing: -0.3px;
+    }
+    .product-card.sold-out .name { text-decoration: line-through; }
+    .product-card.sold-out .price { color: var(--color-text-sub); }
+
+    /* ─────────── 상세 페이지 ─────────── */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: transparent;
+      border: none;
+      color: var(--color-text-sub);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 8px 4px;
+      margin: 0 0 8px;
+      letter-spacing: -0.2px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .back-btn:active { transform: translateX(-2px); }
+
+    .detail-image {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      background: linear-gradient(135deg, #FFE0E6, #FFC4CD);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    .detail-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .detail-image .fallback-emoji {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 130px;
+    }
+    .detail-image .detail-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 6px 13px;
+      border-radius: 8px;
+      letter-spacing: -0.2px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      color: white;
+    }
+    .detail-image .detail-badge.sold-out-badge { background: #6B7280; }
+    .detail-image .detail-badge.low-stock-badge {
+      background: var(--color-error);
+      animation: cardBadgePulse 1.5s ease-in-out infinite;
+    }
+
+    .detail-brand {
+      font-size: 12px;
+      color: var(--color-text-sub);
+      font-weight: 600;
+      margin-bottom: 4px;
+      letter-spacing: -0.1px;
+    }
+    .detail-name {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--color-text);
+      line-height: 1.35;
+      margin-bottom: 14px;
+      letter-spacing: -0.4px;
+    }
+    .detail-price {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--color-price);
+      letter-spacing: -0.7px;
+      margin-bottom: 6px;
+    }
+    .detail-delivery {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11.5px;
+      color: var(--color-text-sub);
+      background: #F3F4F6;
+      padding: 4px 11px;
+      border-radius: 6px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .detail-description {
+      background: #FAFAF5;
+      border-left: 3px solid var(--color-primary);
+      padding: 12px 14px;
+      border-radius: 0 10px 10px 0;
+      font-size: 13.5px;
+      color: var(--color-text);
+      font-weight: 500;
+      line-height: 1.6;
+      margin-bottom: 18px;
+      letter-spacing: -0.2px;
+    }
+    .detail-qty-card {
+      background: white;
+      border: 1.5px solid var(--color-border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .detail-qty-card .label {
+      font-size: 13.5px;
+      color: var(--color-text);
+      font-weight: 700;
+    }
+    .cta-buy-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+      letter-spacing: -0.3px;
+      margin-top: 10px;
+      box-shadow: 0 2px 6px rgba(52, 106, 255, 0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+    .cta-buy-btn:hover { background: var(--color-primary-dark); }
+    .cta-buy-btn:active { transform: scale(0.99); }
+    .cta-buy-btn:disabled {
+      background: #D1D5DB;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .cta-buy-btn .cta-sub {
+      font-size: 11.5px;
+      font-weight: 600;
+      opacity: 0.9;
+      letter-spacing: -0.2px;
+    }
+    /* 결제 안내 카드 — 상세 페이지 구매 버튼 위 */
+    .payment-method-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--color-primary-light);
+      border: 1px solid #C8DCFF;
+      border-radius: 8px;
+      padding: 11px 14px;
+      margin-top: 14px;
+      font-size: 12.5px;
+      color: var(--color-primary-dark);
+      letter-spacing: -0.2px;
+    }
+    .payment-method-info .pm-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .payment-method-info .pm-body strong {
+      font-weight: 800;
+      display: block;
+      font-size: 13px;
+      margin-bottom: 1px;
+    }
+    .payment-method-info .pm-body span {
+      font-weight: 500;
+      color: var(--color-text-sub);
+    }
+
+    /* ─────────── 폼 view 상품 요약 ─────────── */
+    .form-product-summary {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, #FFFFFF, #FAFAF5);
+      border: 1.5px solid var(--color-primary-light);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .form-product-summary .thumb,
+    .form-product-summary .thumb-fallback {
+      width: 56px;
+      height: 56px;
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+    .form-product-summary .thumb {
+      object-fit: cover;
+      background: #F3F4F6;
+    }
+    .form-product-summary .thumb-fallback {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      background: linear-gradient(135deg, #FFE0E6, #FFC4CD);
+    }
+    .form-product-summary .info {
+      flex: 1;
+      min-width: 0;
+    }
+    .form-product-summary .info .name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-text);
+      line-height: 1.3;
+      margin-bottom: 3px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      letter-spacing: -0.2px;
+    }
+    .form-product-summary .info .qty-price {
+      font-size: 12.5px;
+      color: var(--color-text-sub);
+      font-weight: 600;
+    }
+    .form-product-summary .info .qty-price strong {
+      color: var(--color-price);
+      font-weight: 800;
+      font-size: 14.5px;
+    }
+
+    /* (기존) Product Selection — 라디오 방식, 마켓 변환 후 안 씀 */
     .product-options {
       display: flex;
       flex-direction: column;
@@ -563,26 +902,28 @@
       line-height: 48px;
     }
 
-    /* Total Price */
+    /* Total Price — 쿠팡 스타일 (흰 배경 + 빨간 가격) */
     .total-bar {
-      background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+      background: var(--color-card);
+      border: 1px solid var(--color-border);
       border-radius: var(--radius);
-      padding: 18px 20px;
-      margin-bottom: 14px;
+      padding: 14px 18px;
+      margin-bottom: 4px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      color: white;
     }
     .total-bar .label {
-      font-size: 15px;
-      font-weight: 600;
-      opacity: 0.9;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-text);
+      letter-spacing: -0.2px;
     }
     .total-bar .amount {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--color-price);
+      letter-spacing: -0.6px;
     }
 
     /* Address */
@@ -1370,44 +1711,71 @@
     <p class="subtitle">주문해 주셔서 감사합니다</p>
   </div>
 
-  <!-- ORDER FORM -->
-  <div class="form-wrap hidden" id="formWrap">
-    <!-- Bank Info Notice -->
-    <div class="notice">
-      <strong>💰 주문 후 아래 계좌로 입금해주세요</strong>
-      <div class="bank-info">
-        <span id="bankDisplay">농협 123-4567-8901-23</span>
-        <button class="copy-btn" onclick="copyAccount()">복사</button>
-      </div>
-      <div style="margin-top:8px; font-size:12.5px; color:#4B7A3A;">
-        ※ 입금자명이 주문자명과 다를 경우 아래에 별도 입력해주세요
-      </div>
+  <!-- ═════════ VIEW: MARKET (그리드) ═════════ -->
+  <div class="view-market hidden" id="viewMarket">
+    <div class="product-grid" id="productGrid">
+      <!-- 동적 생성 -->
     </div>
+  </div>
 
-    <!-- Product Selection -->
-    <div class="card">
-      <div class="card-title"><span class="icon">📦</span> 상품 선택</div>
-      <div class="product-options" id="productOptions">
-        <!-- Dynamically generated -->
-      </div>
+  <!-- ═════════ VIEW: DETAIL (상품 상세) ═════════ -->
+  <div class="view-detail hidden" id="viewDetail">
+    <button class="back-btn" onclick="goBackToMarket()">← 상품 목록으로</button>
+    <div class="detail-image" id="detailImage">
+      <!-- img 또는 emoji fallback -->
     </div>
-
-    <!-- Quantity + Total -->
-    <div class="card">
-      <div class="card-title"><span class="icon">🔢</span> 수량</div>
+    <div class="detail-brand" id="detailBrand"></div>
+    <h1 class="detail-name" id="detailName"></h1>
+    <div class="detail-price" id="detailPrice"></div>
+    <div class="detail-delivery">🚚 입금 확인 후 발송</div>
+    <div class="detail-description" id="detailDescription" style="display:none;"></div>
+    <div class="detail-qty-card">
+      <span class="label">🔢 수량</span>
       <div class="qty-control">
         <button class="qty-btn" onclick="changeQty(-1)">−</button>
         <div class="qty-value" id="qtyDisplay">1</div>
         <button class="qty-btn" onclick="changeQty(1)">+</button>
       </div>
     </div>
-
     <div class="total-bar">
       <span class="label">총 결제금액</span>
       <span class="amount" id="totalAmount">0원</span>
     </div>
+    <div class="payment-method-info">
+      <span class="pm-icon">💳</span>
+      <div class="pm-body">
+        <strong>결제 방법: 무통장입금 (계좌이체)</strong>
+        <span>주문 후 안내된 계좌로 입금하시면 순차 발송됩니다</span>
+      </div>
+    </div>
+    <button class="cta-buy-btn" id="ctaBuyBtn" onclick="goToForm()">
+      <span>구매하기 (무통장입금)</span>
+      <span class="cta-sub">주문 후 계좌로 입금 → 발송</span>
+    </button>
+  </div>
 
-    <!-- Customer Info -->
+  <!-- ═════════ VIEW: FORM (주문 정보 입력) ═════════ -->
+  <div class="view-form hidden" id="viewForm">
+    <button class="back-btn" onclick="goBackToDetail()">← 상품 정보로</button>
+
+    <!-- 선택한 상품 요약 -->
+    <div class="form-product-summary" id="formProductSummary">
+      <!-- 동적 생성 -->
+    </div>
+
+    <!-- 계좌 안내 -->
+    <div class="notice">
+      <strong>💰 주문 후 아래 계좌로 입금해주세요</strong>
+      <div class="bank-info">
+        <span id="bankDisplay">농협 123-4567-8901-23</span>
+        <button class="copy-btn" onclick="copyAccount()">복사</button>
+      </div>
+      <div style="margin-top:8px; font-size:12.5px; color:var(--color-text-sub);">
+        ※ 입금자명이 주문자명과 다를 경우 아래에 별도 입력해주세요
+      </div>
+    </div>
+
+    <!-- 주문자 정보 -->
     <div class="card">
       <div class="card-title"><span class="icon">👤</span> 주문자 정보</div>
       <div class="field">
@@ -1428,7 +1796,7 @@
       </div>
     </div>
 
-    <!-- Sender Info -->
+    <!-- 보내는 분 정보 -->
     <div class="card">
       <div class="card-title"><span class="icon">🎁</span> 보내는 분 정보</div>
       <label class="checkbox-row" style="margin-top:0; margin-bottom:14px;">
@@ -1451,7 +1819,7 @@
       </div>
     </div>
 
-    <!-- Delivery Info -->
+    <!-- 배송 정보 -->
     <div class="card">
       <div class="card-title"><span class="icon">🚚</span> 배송 정보</div>
       <div class="field">
@@ -1474,7 +1842,7 @@
       </div>
     </div>
 
-    <!-- Agreement + Submit -->
+    <!-- 동의 + 제출 -->
     <div class="card">
       <label class="checkbox-row">
         <input type="checkbox" id="agree">
@@ -1484,7 +1852,10 @@
     </div>
 
     <button class="submit-btn" id="submitBtn" onclick="submitOrder()">
-      주문하기
+      <span style="display:block; font-size:16px; font-weight:800;">주문 신청하기</span>
+      <span style="display:block; font-size:11.5px; font-weight:600; opacity:0.9; margin-top:3px;">
+        제출 후 안내된 계좌로 입금해주세요
+      </span>
     </button>
   </div>
 
@@ -1644,10 +2015,223 @@ async function init() {
   await loadConfig();
   renderShop();
   bindSenderSync();
-  // 로딩 끝 → 헤더 + 폼 표시
   document.getElementById('loadingScreen').classList.add('hidden');
   document.getElementById('shopHeader').style.display = '';
-  document.getElementById('formWrap').classList.remove('hidden');
+  // 마켓 뷰로 시작
+  showView('market');
+  setupHistoryRouting();
+}
+
+/* 현재 view 상태 */
+let currentView = 'market';  // 'market' | 'detail' | 'form' | 'success'
+
+/* 브라우저 뒤로가기 처리 */
+function setupHistoryRouting() {
+  window.addEventListener('popstate', (e) => {
+    const state = e.state;
+    if (state && state.view) {
+      if ((state.view === 'detail' || state.view === 'form') && state.productIdx != null) {
+        const p = SHOP.products[state.productIdx];
+        if (p) {
+          selectedProduct = state.productIdx;
+          if (state.view === 'detail') renderDetail(p);
+          if (state.view === 'form') { renderDetail(p); renderFormSummary(p); }
+        }
+      }
+      showViewInternal(state.view);
+    } else {
+      showViewInternal('market');
+    }
+  });
+}
+
+/* view 전환 (history pushState 함께) */
+function showView(viewName) {
+  showViewInternal(viewName);
+  const state = { view: viewName, productIdx: selectedProduct };
+  try { history.pushState(state, '', '#' + viewName); } catch(e) {}
+}
+
+/* view 전환만 (히스토리 갱신 안 함, popstate 처리용) */
+function showViewInternal(viewName) {
+  ['market', 'detail', 'form'].forEach(v => {
+    const el = document.getElementById('view' + v.charAt(0).toUpperCase() + v.slice(1));
+    if (el) el.classList.toggle('hidden', v !== viewName);
+  });
+  // 성공 화면은 별도 처리
+  const success = document.getElementById('successScreen');
+  if (viewName !== 'success' && success) success.classList.remove('show');
+  if (viewName === 'success' && success) success.classList.add('show');
+  currentView = viewName;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* 마켓 → 상세 */
+function goToDetail(idx) {
+  selectProduct(idx);
+  renderDetail(SHOP.products[idx]);
+  showView('detail');
+}
+/* 상세 → 마켓 */
+function goBackToMarket() {
+  showView('market');
+}
+/* 상세 → 폼 */
+function goToForm() {
+  if (selectedProduct === null) return;
+  const p = SHOP.products[selectedProduct];
+  if (!p) return;
+  const stock = getStock(p);
+  if (stock !== null && stock <= 0) {
+    alert('죄송합니다. 해당 상품은 품절되었습니다.');
+    return;
+  }
+  renderFormSummary(p);
+  showView('form');
+}
+/* 폼 → 상세 */
+function goBackToDetail() {
+  showView('detail');
+}
+
+/* 상품명 기반 이모지 추정 (이미지 없을 때 fallback) */
+function guessEmoji(name) {
+  const n = String(name || '').toLowerCase();
+  if (n.includes('딸기')) return '🍓';
+  if (n.includes('포도') || n.includes('샤인')) return '🍇';
+  if (n.includes('배')) return '🍐';
+  if (n.includes('감') || n.includes('단감')) return '🍊';
+  if (n.includes('키위')) return '🥝';
+  if (n.includes('고추')) return '🌶️';
+  if (n.includes('사과')) return '🍎';
+  if (n.includes('수박')) return '🍉';
+  if (n.includes('복숭아')) return '🍑';
+  if (n.includes('멜론')) return '🍈';
+  if (n.includes('바나나')) return '🍌';
+  if (n.includes('오렌지') || n.includes('귤')) return '🍊';
+  if (n.includes('토마토')) return '🍅';
+  return '🛒';
+}
+
+/* 마켓 그리드 렌더링 */
+function renderMarketGrid() {
+  const grid = document.getElementById('productGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  SHOP.products.forEach((p, i) => {
+    const stock = getStock(p);
+    const isOut = stock !== null && stock <= 0;
+    const isLow = stock !== null && stock > 0 && stock <= 5;
+
+    const card = document.createElement('div');
+    card.className = 'product-card' + (isOut ? ' sold-out' : '');
+
+    let badgeHtml = '';
+    if (isOut) {
+      badgeHtml = '<span class="card-badge sold-out-badge">품절</span>';
+    } else if (isLow) {
+      badgeHtml = `<span class="card-badge low-stock-badge">🔥 ${stock}개</span>`;
+    }
+
+    const imageHtml = p.imageUrl
+      ? `<img src="${escapeAttr(p.imageUrl)}" alt="${escapeAttr(p.name)}" loading="lazy"
+              onerror="this.style.display='none'; var f=this.parentNode.querySelector('.fallback-emoji'); if(f) f.style.display='flex';">
+         <div class="fallback-emoji" style="display:none">${guessEmoji(p.name)}</div>`
+      : `<div class="fallback-emoji">${guessEmoji(p.name)}</div>`;
+
+    card.innerHTML = `
+      <div class="product-card-image">
+        ${imageHtml}
+        ${badgeHtml}
+      </div>
+      <div class="product-card-body">
+        ${p.brand ? `<div class="brand">[${escapeHtml(p.brand)}]</div>` : ''}
+        <div class="name">${escapeHtml(p.name)}</div>
+        <div class="price">${p.price.toLocaleString()}원</div>
+      </div>
+    `;
+    if (!isOut) {
+      card.addEventListener('click', () => goToDetail(i));
+    }
+    grid.appendChild(card);
+  });
+}
+
+/* 상세 페이지 렌더링 */
+function renderDetail(p) {
+  if (!p) return;
+  const stock = getStock(p);
+  const isOut = stock !== null && stock <= 0;
+  const isLow = stock !== null && stock > 0 && stock <= 5;
+
+  // 이미지
+  const detailImage = document.getElementById('detailImage');
+  let inner = '';
+  if (p.imageUrl) {
+    inner = `
+      <img src="${escapeAttr(p.imageUrl)}" alt="${escapeAttr(p.name)}"
+           onerror="this.style.display='none'; var f=this.parentNode.querySelector('.fallback-emoji'); if(f) f.style.display='flex';">
+      <div class="fallback-emoji" style="display:none">${guessEmoji(p.name)}</div>
+    `;
+  } else {
+    inner = `<div class="fallback-emoji">${guessEmoji(p.name)}</div>`;
+  }
+  if (isOut) inner += '<span class="detail-badge sold-out-badge">품절</span>';
+  else if (isLow) inner += `<span class="detail-badge low-stock-badge">🔥 마지막 ${stock}개</span>`;
+  detailImage.innerHTML = inner;
+
+  // 텍스트
+  const brand = document.getElementById('detailBrand');
+  if (p.brand) {
+    brand.textContent = '[' + p.brand + ']';
+    brand.style.display = '';
+  } else {
+    brand.style.display = 'none';
+  }
+  document.getElementById('detailName').textContent = p.name;
+  document.getElementById('detailPrice').textContent = p.price.toLocaleString() + '원';
+
+  const desc = document.getElementById('detailDescription');
+  if (p.description) {
+    desc.textContent = p.description;
+    desc.style.display = '';
+  } else {
+    desc.style.display = 'none';
+  }
+
+  // 구매 버튼
+  const buyBtn = document.getElementById('ctaBuyBtn');
+  buyBtn.disabled = isOut;
+  buyBtn.innerHTML = isOut
+    ? '<span>품절</span>'
+    : '<span>구매하기 (무통장입금)</span><span class="cta-sub">주문 후 계좌로 입금 → 발송</span>';
+
+  // 수량이 재고보다 많으면 조정
+  if (stock !== null && quantity > Math.max(1, stock)) {
+    quantity = Math.max(1, stock);
+  }
+  if (isOut) quantity = 1;
+  document.getElementById('qtyDisplay').textContent = quantity;
+  updateTotal();
+}
+
+/* 폼 view 의 상품 요약 카드 렌더링 */
+function renderFormSummary(p) {
+  const summary = document.getElementById('formProductSummary');
+  if (!summary || !p) return;
+  const imageHtml = p.imageUrl
+    ? `<img class="thumb" src="${escapeAttr(p.imageUrl)}" alt=""
+            onerror="this.style.display='none'; var f=this.parentNode.querySelector('.thumb-fallback'); if(f) f.style.display='flex';">
+       <div class="thumb-fallback" style="display:none">${guessEmoji(p.name)}</div>`
+    : `<div class="thumb-fallback">${guessEmoji(p.name)}</div>`;
+  const total = p.price * quantity;
+  summary.innerHTML = `
+    ${imageHtml}
+    <div class="info">
+      <div class="name">${escapeHtml(p.name)}</div>
+      <div class="qty-price">수량 ${quantity}개 · <strong>${total.toLocaleString()}원</strong></div>
+    </div>
+  `;
 }
 
 async function loadConfig() {
@@ -1676,54 +2260,10 @@ async function loadConfig() {
 function renderShop() {
   document.getElementById('shopTitle').textContent = SHOP.shopName;
   document.title = `주문하기 - ${SHOP.shopName}`;
-
   document.getElementById('bankDisplay').textContent =
     `${SHOP.bank.name} ${SHOP.bank.account}`;
-
-  const container = document.getElementById('productOptions');
-  container.innerHTML = '';
-  SHOP.products.forEach((p, i) => {
-    const stock = getStock(p);
-    const isOut = stock !== null && stock <= 0;
-    const isLow = stock !== null && stock > 0 && stock <= 5;
-
-    const div = document.createElement('div');
-    div.className = 'product-option' + (isOut ? ' sold-out' : '');
-    div.setAttribute('data-index', i);
-
-    const thumbHtml = p.imageUrl
-      ? `<img class="product-thumb" src="${escapeAttr(p.imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none'">`
-      : '';
-
-    let badgeHtml = '';
-    if (isOut) {
-      badgeHtml = '<span class="stock-badge sold-out-badge">품절</span>';
-    } else if (isLow) {
-      badgeHtml = `<span class="stock-badge low-stock-badge">🔥 마지막 ${stock}개</span>`;
-    }
-
-    div.innerHTML = `
-      <input type="radio" name="product" value="${i}">
-      ${thumbHtml}
-      <div class="product-body">
-        <span class="name">${escapeHtml(p.name)}</span>
-        ${badgeHtml}
-      </div>
-      <span class="price">${p.price.toLocaleString()}원</span>
-    `;
-
-    if (!isOut) {
-      div.addEventListener('click', () => selectProduct(i));
-    }
-    container.appendChild(div);
-  });
-
-  // 재고 있는 첫 상품 자동 선택
-  const firstAvailable = SHOP.products.findIndex(p => {
-    const stock = getStock(p);
-    return stock === null || stock > 0;
-  });
-  if (firstAvailable >= 0) selectProduct(firstAvailable);
+  // 마켓 그리드 렌더 (라디오 방식은 마켓 카드로 대체됨)
+  renderMarketGrid();
 }
 
 /* 상품의 재고 값 정규화: null = 무제한, 숫자 = 그 수량 */
@@ -2095,19 +2635,17 @@ async function submitOrder() {
 }
 
 function showSuccess(orderId, totalPrice) {
-  document.getElementById('formWrap').classList.add('hidden');
   document.getElementById('orderId').textContent = orderId;
   document.getElementById('successBankDisplay').textContent =
     `${SHOP.bank.name} ${SHOP.bank.account}`;
   document.getElementById('successHolder').textContent = SHOP.bank.holder || '';
   document.getElementById('successAmount').textContent =
     (totalPrice || 0).toLocaleString() + '원';
-  // 하단 조회 섹션에 주문번호 자동 채워두기 (클릭 시 바로 조회 가능)
+  // 하단 조회 섹션에 주문번호 자동 채워두기
   const lookupInput = document.getElementById('lookupOrderId');
   if (lookupInput) lookupInput.value = orderId;
-  const screen = document.getElementById('successScreen');
-  screen.classList.add('show');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // success view 로 전환 (다른 view 자동 숨김)
+  showView('success');
 }
 
 /* 성공 화면의 "내 주문 상태 확인하기" 버튼 → 하단 조회 섹션으로 이동 */
