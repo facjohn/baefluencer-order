@@ -207,12 +207,13 @@
     .product-option {
       border: 1.5px solid var(--color-border);
       border-radius: 12px;
-      padding: 14px 16px;
+      padding: 12px 14px;
       cursor: pointer;
       transition: all 0.2s;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 12px;
       -webkit-tap-highlight-color: transparent;
     }
     .product-option:active {
@@ -222,16 +223,256 @@
       border-color: var(--color-primary);
       background: var(--color-primary-light);
     }
+    .product-option .product-thumb {
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #F3F4F6;
+    }
+    .product-option .product-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
     .product-option .name {
       font-size: 14.5px;
       font-weight: 600;
+      word-break: keep-all;
+      line-height: 1.4;
     }
     .product-option .price {
       font-size: 14.5px;
       font-weight: 700;
       color: var(--color-primary);
+      flex-shrink: 0;
     }
     .product-option input[type="radio"] { display: none; }
+    /* 재고 배지 */
+    .stock-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      width: fit-content;
+      align-self: flex-start;
+      letter-spacing: -0.2px;
+    }
+    .stock-badge.sold-out-badge {
+      background: #E5E7EB;
+      color: #6B7280;
+    }
+    .stock-badge.low-stock-badge {
+      background: linear-gradient(135deg, #FEE2E2, #FECACA);
+      color: #DC2626;
+      animation: lowStockPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes lowStockPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 transparent; }
+      50%      { transform: scale(1.06); box-shadow: 0 2px 10px rgba(220, 38, 38, 0.35); }
+    }
+    /* 품절 상품 */
+    .product-option.sold-out {
+      opacity: 0.55;
+      cursor: not-allowed;
+      background: #FAFAFA;
+    }
+    .product-option.sold-out:active { transform: none; }
+    .product-option.sold-out .name {
+      text-decoration: line-through;
+      color: var(--color-text-sub);
+    }
+    .product-option.sold-out .price {
+      color: var(--color-text-sub);
+    }
+    /* 수량 한계 도달 시 흔들기 */
+    .qty-value.shake {
+      animation: shake 0.4s ease-in-out;
+    }
+    /* 주문 조회 링크 (성공 화면) */
+    .order-status-link {
+      display: inline-block;
+      max-width: 340px;
+      margin: 20px auto 0;
+      padding: 13px 20px;
+      background: var(--color-primary-light);
+      border: 1.5px solid var(--color-primary);
+      border-radius: 12px;
+      color: var(--color-primary-dark);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      letter-spacing: -0.2px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .order-status-link:active { transform: scale(0.97); }
+    .order-status-link:hover {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    /* ─────────── 주문 조회 섹션 (페이지 하단) ─────────── */
+    .lookup-divider {
+      position: relative;
+      text-align: center;
+      margin: 40px 0 18px;
+      color: var(--color-text-sub);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .lookup-divider::before,
+    .lookup-divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: calc(50% - 36px);
+      height: 1px;
+      background: var(--color-border);
+    }
+    .lookup-divider::before { left: 0; }
+    .lookup-divider::after { right: 0; }
+    .lookup-card .card-subtitle {
+      font-size: 12.5px;
+      color: var(--color-text-sub);
+      margin-top: -10px;
+      margin-bottom: 16px;
+    }
+    .lookup-error {
+      display: none;
+      background: #FEF2F2;
+      border: 1.5px solid #FECACA;
+      color: var(--color-error);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+    .lookup-error.show { display: block; }
+    /* 조회 결과 카드 */
+    .lookup-result {
+      display: none;
+      background: var(--color-card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 14px;
+      animation: fadeInUp 0.4s ease-out;
+    }
+    .lookup-result.show { display: block; }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .lookup-result .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1.5px solid var(--color-primary-light);
+      margin-bottom: 14px;
+    }
+    .lookup-result .res-order-id {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      letter-spacing: -0.3px;
+    }
+    .lookup-result .res-order-date {
+      font-size: 11.5px;
+      color: var(--color-text-sub);
+      font-weight: 600;
+      text-align: right;
+    }
+    .lookup-result .res-product-box {
+      background: var(--color-primary-light);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+    .lookup-result .res-pname {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+    }
+    .lookup-result .res-pqty {
+      font-size: 12.5px;
+      color: var(--color-text-sub);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .lookup-result .res-pprice {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      margin-top: 6px;
+      letter-spacing: -0.5px;
+    }
+    .lookup-status-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #F3F4F6;
+    }
+    .lookup-status-row:last-child { border-bottom: none; }
+    .lookup-status-row .icon-circle {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #F3F4F6;
+      color: #9CA3AF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 16px;
+    }
+    .lookup-status-row.done .icon-circle {
+      background: var(--color-success);
+      color: white;
+    }
+    .lookup-status-row.pending .icon-circle,
+    .lookup-status-row.warning .icon-circle {
+      background: #FEF3C7;
+      color: #F59E0B;
+    }
+    .lookup-status-row .info { flex: 1; min-width: 0; }
+    .lookup-status-row .label {
+      font-size: 12.5px;
+      color: var(--color-text-sub);
+      font-weight: 600;
+      margin-bottom: 1px;
+    }
+    .lookup-status-row .value {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-text);
+      letter-spacing: -0.2px;
+    }
+    .lookup-status-row.done .value { color: var(--color-success); }
+    .lookup-status-row.pending .value { color: #B45309; }
+    .tracking-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+      padding: 6px 12px;
+      background: var(--color-primary);
+      color: white;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      text-decoration: none;
+      letter-spacing: -0.2px;
+    }
+    .tracking-link:active { transform: scale(0.96); }
 
     /* Quantity */
     .qty-control {
@@ -1024,6 +1265,9 @@
       <button class="copy-btn" onclick="copyAccount()">복사</button>
     </div>
     <p style="margin-top:18px;">입금 확인 후 순차적으로 발송됩니다.</p>
+    <a class="order-status-link" id="orderStatusLink" href="#lookupSection" onclick="openLookupFromSuccess(event)">
+      📋 내 주문 상태 확인하기
+    </a>
     <div class="social-cta">
       <div class="social-cta-headline">팔로우하고 라이브방송 놓치지 마세요!</div>
       <div class="social-cta-handle">@배플루언서</div>
@@ -1040,6 +1284,54 @@
           <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/></svg>
           <span class="social-label">TikTok</span>
         </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────── 주문 조회 섹션 (페이지 하단, 항상 표시) ─────────── -->
+  <div id="lookupSection">
+    <div class="lookup-divider">OR</div>
+    <div class="card lookup-card">
+      <div class="card-title"><span class="icon">📋</span> 내 주문 조회</div>
+      <div class="card-subtitle">이미 주문하셨나요? 주문번호로 상태를 확인할 수 있어요</div>
+      <div class="field">
+        <label>주문번호</label>
+        <input type="text" id="lookupOrderId" placeholder="예: 2026-04-29-1" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>휴대폰 뒷 4자리</label>
+        <input type="tel" id="lookupPhone" placeholder="0000" maxlength="4" inputmode="numeric"
+               oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+      </div>
+      <button class="submit-btn" id="lookupBtn" onclick="lookupOrder()">조회하기</button>
+      <div class="lookup-error" id="lookupError"></div>
+    </div>
+
+    <!-- 조회 결과 카드 (조회 성공 시 표시) -->
+    <div class="lookup-result" id="lookupResult">
+      <div class="result-header">
+        <div class="res-order-id" id="resOrderId"></div>
+        <div class="res-order-date" id="resOrderDate"></div>
+      </div>
+      <div class="res-product-box">
+        <div class="res-pname" id="resProduct"></div>
+        <div class="res-pqty" id="resQty"></div>
+        <div class="res-pprice" id="resPrice"></div>
+      </div>
+      <div class="lookup-status-row" id="resPaymentRow">
+        <div class="icon-circle">💰</div>
+        <div class="info">
+          <div class="label">입금 확인</div>
+          <div class="value" id="resPayment"></div>
+        </div>
+      </div>
+      <div class="lookup-status-row" id="resShippingRow">
+        <div class="icon-circle">📦</div>
+        <div class="info">
+          <div class="label">배송 상태</div>
+          <div class="value" id="resShipping"></div>
+          <div id="resTrackingArea"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1117,19 +1409,65 @@ function renderShop() {
   const container = document.getElementById('productOptions');
   container.innerHTML = '';
   SHOP.products.forEach((p, i) => {
+    const stock = getStock(p);
+    const isOut = stock !== null && stock <= 0;
+    const isLow = stock !== null && stock > 0 && stock <= 5;
+
     const div = document.createElement('div');
-    div.className = 'product-option';
+    div.className = 'product-option' + (isOut ? ' sold-out' : '');
     div.setAttribute('data-index', i);
+
+    const thumbHtml = p.imageUrl
+      ? `<img class="product-thumb" src="${escapeAttr(p.imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+      : '';
+
+    let badgeHtml = '';
+    if (isOut) {
+      badgeHtml = '<span class="stock-badge sold-out-badge">품절</span>';
+    } else if (isLow) {
+      badgeHtml = `<span class="stock-badge low-stock-badge">🔥 마지막 ${stock}개</span>`;
+    }
+
     div.innerHTML = `
       <input type="radio" name="product" value="${i}">
-      <span class="name">${p.name}</span>
+      ${thumbHtml}
+      <div class="product-body">
+        <span class="name">${escapeHtml(p.name)}</span>
+        ${badgeHtml}
+      </div>
       <span class="price">${p.price.toLocaleString()}원</span>
     `;
-    div.addEventListener('click', () => selectProduct(i));
+
+    if (!isOut) {
+      div.addEventListener('click', () => selectProduct(i));
+    }
     container.appendChild(div);
   });
 
-  if (SHOP.products.length > 0) selectProduct(0);
+  // 재고 있는 첫 상품 자동 선택
+  const firstAvailable = SHOP.products.findIndex(p => {
+    const stock = getStock(p);
+    return stock === null || stock > 0;
+  });
+  if (firstAvailable >= 0) selectProduct(firstAvailable);
+}
+
+/* 상품의 재고 값 정규화: null = 무제한, 숫자 = 그 수량 */
+function getStock(p) {
+  if (!p) return null;
+  if (p.stock === null || p.stock === undefined || p.stock === '') return null;
+  const n = Number(p.stock);
+  return isNaN(n) ? null : n;
+}
+
+/* HTML/속성 이스케이프 */
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function escapeAttr(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 function bindSenderSync() {
@@ -1152,17 +1490,34 @@ function selectProduct(index) {
   selectedProduct = index;
   document.querySelectorAll('.product-option').forEach((el, i) => {
     el.classList.toggle('selected', i === index);
-    el.querySelector('input').checked = (i === index);
+    const input = el.querySelector('input');
+    if (input) input.checked = (i === index);
   });
+  // 선택한 상품 재고가 현재 수량보다 적으면 수량 자동 축소
+  const stock = getStock(SHOP.products[index]);
+  if (stock !== null && quantity > stock) {
+    quantity = Math.max(1, stock);
+    document.getElementById('qtyDisplay').textContent = quantity;
+  }
   updateTotal();
 }
 
 /* ============================================
-   수량 조절
+   수량 조절 (재고 한계 검증)
    ============================================ */
 function changeQty(delta) {
   const newQty = quantity + delta;
   if (newQty < 1 || newQty > SHOP.maxQty) return;
+  const stock = getStock(SHOP.products[selectedProduct]);
+  if (stock !== null && newQty > stock) {
+    // 재고 한계 도달 — 흔들기 피드백
+    const qtyEl = document.getElementById('qtyDisplay');
+    qtyEl.classList.remove('shake');
+    void qtyEl.offsetWidth;
+    qtyEl.classList.add('shake');
+    setTimeout(() => qtyEl.classList.remove('shake'), 400);
+    return;
+  }
   quantity = newQty;
   document.getElementById('qtyDisplay').textContent = quantity;
   updateTotal();
@@ -1442,13 +1797,26 @@ async function submitOrder() {
     showSuccess(result.orderId, orderData.totalPrice);
   } catch (error) {
     console.error('Submit error:', error);
-    alert(
-      '⚠️ 주문이 접수되지 않았습니다.\n\n' +
-      '입금하지 마시고 잠시 후 다시 시도해주세요.\n\n' +
-      `(에러: ${error.message})`
-    );
-    btn.disabled = false;
-    btn.classList.remove('loading');
+    // 재고 부족/품절은 친절한 메시지 + 재고 새로고침
+    const isStockError = /재고|품절/.test(error.message);
+    if (isStockError) {
+      alert(
+        '⚠️ ' + error.message + '\n\n' +
+        '최신 재고로 새로고침합니다.'
+      );
+      btn.disabled = false;
+      btn.classList.remove('loading');
+      // 최신 재고 다시 가져오기
+      try { await loadConfig(); renderShop(); } catch(e) { /* ignore */ }
+    } else {
+      alert(
+        '⚠️ 주문이 접수되지 않았습니다.\n\n' +
+        '입금하지 마시고 잠시 후 다시 시도해주세요.\n\n' +
+        `(에러: ${error.message})`
+      );
+      btn.disabled = false;
+      btn.classList.remove('loading');
+    }
   }
 }
 
@@ -1460,13 +1828,149 @@ function showSuccess(orderId, totalPrice) {
   document.getElementById('successHolder').textContent = SHOP.bank.holder || '';
   document.getElementById('successAmount').textContent =
     (totalPrice || 0).toLocaleString() + '원';
+  // 하단 조회 섹션에 주문번호 자동 채워두기 (클릭 시 바로 조회 가능)
+  const lookupInput = document.getElementById('lookupOrderId');
+  if (lookupInput) lookupInput.value = orderId;
   const screen = document.getElementById('successScreen');
   screen.classList.add('show');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+/* 성공 화면의 "내 주문 상태 확인하기" 버튼 → 하단 조회 섹션으로 이동 */
+function openLookupFromSuccess(e) {
+  if (e) e.preventDefault();
+  const orderId = document.getElementById('orderId').textContent;
+  const lookupInput = document.getElementById('lookupOrderId');
+  if (lookupInput && orderId) lookupInput.value = orderId;
+  document.getElementById('lookupSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // 휴대폰 칸으로 자동 포커스
+  setTimeout(() => document.getElementById('lookupPhone')?.focus(), 600);
+}
+
+/* ============================================
+   주문 조회 (페이지 하단 섹션)
+   ============================================ */
+function showLookupError(msg) {
+  const box = document.getElementById('lookupError');
+  box.textContent = msg;
+  box.classList.add('show');
+  setTimeout(() => box.classList.remove('show'), 5000);
+}
+
+async function lookupOrder() {
+  const orderId = document.getElementById('lookupOrderId').value.trim();
+  const phoneLast4 = document.getElementById('lookupPhone').value.trim();
+
+  if (!orderId) { showLookupError('주문번호를 입력해주세요'); return; }
+  if (phoneLast4.length !== 4) { showLookupError('휴대폰 뒷 4자리를 정확히 입력해주세요'); return; }
+
+  const btn = document.getElementById('lookupBtn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+  document.getElementById('lookupError').classList.remove('show');
+  document.getElementById('lookupResult').classList.remove('show');
+
+  try {
+    const url = `${CONFIG.scriptUrl}?action=getOrderStatus`
+              + `&orderId=${encodeURIComponent(orderId)}`
+              + `&phoneLast4=${encodeURIComponent(phoneLast4)}`;
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('서버 오류 ' + r.status);
+    const data = await r.json();
+
+    if (data.error) { showLookupError(data.error); return; }
+    if (!data.success) { showLookupError('조회에 실패했습니다'); return; }
+
+    renderLookupResult(data);
+  } catch (err) {
+    showLookupError('네트워크 오류: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+function renderLookupResult(data) {
+  document.getElementById('resOrderId').textContent = data.orderId;
+  document.getElementById('resOrderDate').textContent = data.orderDate || '';
+  document.getElementById('resProduct').textContent = data.product || '-';
+  document.getElementById('resQty').textContent = `수량 ${data.quantity || 0}개`;
+  document.getElementById('resPrice').textContent =
+    (Number(data.totalPrice) || 0).toLocaleString() + '원';
+
+  // 입금 상태
+  const payRow = document.getElementById('resPaymentRow');
+  const payText = document.getElementById('resPayment');
+  payRow.classList.remove('done', 'pending', 'warning');
+  if (data.paymentStatus === '확인완료') {
+    payRow.classList.add('done');
+    payText.textContent = '✓ 입금 확인 완료';
+  } else if (data.paymentStatus === '환불') {
+    payRow.classList.add('warning');
+    payText.textContent = '환불 처리됨';
+  } else {
+    payRow.classList.add('pending');
+    payText.textContent = '입금 확인 대기 중';
+  }
+
+  // 배송 상태 + 송장 추적 링크
+  const shipRow = document.getElementById('resShippingRow');
+  const shipText = document.getElementById('resShipping');
+  const trackArea = document.getElementById('resTrackingArea');
+  shipRow.classList.remove('done', 'pending', 'warning');
+  trackArea.innerHTML = '';
+
+  if (data.shippingStatus === '발송완료') {
+    shipRow.classList.add('done');
+    shipText.textContent = '✓ 배송 시작';
+    if (data.trackingNumber) {
+      const trackUrl = `https://search.naver.com/search.naver?query=${encodeURIComponent('택배조회 ' + data.trackingNumber)}`;
+      trackArea.innerHTML = `
+        <div style="margin-top:4px; font-size:11.5px; color:var(--color-text-sub);">송장 ${escapeHtml(data.trackingNumber)}</div>
+        <a class="tracking-link" href="${trackUrl}" target="_blank" rel="noopener">🚚 배송 추적 ↗</a>
+      `;
+    }
+  } else if (data.shippingStatus === '반품') {
+    shipRow.classList.add('warning');
+    shipText.textContent = '반품 처리됨';
+  } else {
+    shipRow.classList.add('pending');
+    shipText.textContent = data.paymentStatus === '확인완료'
+      ? '발송 준비 중'
+      : '입금 확인 후 발송됩니다';
+  }
+
+  document.getElementById('lookupResult').classList.add('show');
+  setTimeout(() => {
+    document.getElementById('lookupResult').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
+}
+
+/* URL 파라미터로 주문번호 자동 채움 (구버전 order.html?id= 호환용) */
+function fillLookupFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  if (id) {
+    const input = document.getElementById('lookupOrderId');
+    if (input) {
+      input.value = id;
+      setTimeout(() => document.getElementById('lookupPhone')?.focus(), 300);
+    }
+  }
+  // 엔터 키 → 조회
+  document.getElementById('lookupOrderId')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('lookupPhone')?.focus();
+  });
+  document.getElementById('lookupPhone')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') lookupOrder();
+  });
+}
+
 // Initialize
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+  init();
+  fillLookupFromUrl();
+});
 </script>
 
 </body>

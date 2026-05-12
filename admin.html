@@ -58,15 +58,31 @@
       color: var(--color-text-sub);
       margin-top: 4px;
     }
-    .header .preview-link {
+    .header-actions {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .header .preview-link,
+    .header .copy-link-btn {
       display: inline-block;
       font-size: 12.5px;
       color: var(--color-primary);
-      margin-top: 8px;
       text-decoration: none;
-      padding: 4px 10px;
+      padding: 5px 10px;
       border: 1px solid var(--color-primary);
       border-radius: 8px;
+      background: white;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .header .copy-link-btn:active {
+      transform: scale(0.96);
+      background: var(--color-primary-light);
     }
 
     /* Login Screen */
@@ -380,16 +396,19 @@
 
     /* Products list */
     .product-row {
-      display: grid;
-      grid-template-columns: 1fr 90px 50px 32px;
-      gap: 8px;
-      align-items: center;
       padding: 10px 0;
       border-bottom: 1px solid #F3F4F6;
     }
     .product-row:last-child { border-bottom: none; }
+    .product-row-main {
+      display: grid;
+      grid-template-columns: 1fr 80px 64px 40px 32px;
+      gap: 6px;
+      align-items: center;
+    }
     .product-row input[type="text"],
-    .product-row input[type="number"] {
+    .product-row input[type="number"],
+    .product-row input[type="url"] {
       padding: 9px 10px;
       border: 1.5px solid var(--color-border);
       border-radius: 8px;
@@ -400,6 +419,15 @@
     }
     .product-row input[type="number"] {
       text-align: right;
+    }
+    .product-row input[data-field="stock"] {
+      text-align: center;
+    }
+    .product-row input[data-field="stock"].low-stock {
+      border-color: var(--color-error);
+      background: #FEF2F2;
+      color: var(--color-error);
+      font-weight: 700;
     }
     .product-row input.changed {
       border-color: var(--color-accent);
@@ -429,20 +457,65 @@
     .product-row .delete-btn:active {
       transform: scale(0.92);
     }
+    .product-row-image {
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .product-row-image .image-label {
+      font-size: 11.5px;
+      color: var(--color-text-sub);
+      font-weight: 600;
+      flex-shrink: 0;
+      width: 56px;
+    }
+    .product-row-image input {
+      flex: 1;
+      font-size: 12.5px !important;
+      padding: 7px 10px !important;
+    }
+    .product-row-image .image-preview {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: #F3F4F6;
+      flex-shrink: 0;
+      border: 1px solid var(--color-border);
+    }
     .product-header {
       display: grid;
-      grid-template-columns: 1fr 90px 50px 32px;
-      gap: 8px;
+      grid-template-columns: 1fr 80px 64px 40px 32px;
+      gap: 6px;
       padding-bottom: 8px;
       border-bottom: 1.5px solid var(--color-primary-light);
       font-size: 12px;
       color: var(--color-text-sub);
       font-weight: 600;
     }
+    .product-header > div:nth-child(2),
+    .product-header > div:nth-child(3) {
+      text-align: right;
+    }
     .product-header .col-toggle,
     .product-header .col-action {
       text-align: center;
     }
+    /* 재고 부족 배너 */
+    .low-stock-banner {
+      display: none;
+      background: linear-gradient(135deg, #FEF2F2, #FEE2E2);
+      border: 1.5px solid #FECACA;
+      color: var(--color-error);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.2px;
+    }
+    .low-stock-banner.show { display: block; }
 
     .add-btn {
       width: 100%;
@@ -561,9 +634,14 @@
       .container { padding: 0 12px; }
       .card { padding: 18px 16px; }
       .field { grid-template-columns: 90px 1fr; gap: 8px; }
-      .product-row, .product-header {
-        grid-template-columns: 1fr 80px 44px 28px;
-        gap: 6px;
+      .product-row-main, .product-header {
+        grid-template-columns: 1fr 70px 56px 36px 28px;
+        gap: 4px;
+      }
+      .product-row input[type="text"],
+      .product-row input[type="number"] {
+        font-size: 13px;
+        padding: 8px 8px;
       }
     }
   </style>
@@ -589,7 +667,10 @@
     <div class="header">
       <h1>⚙️ 주문폼 관리자</h1>
       <p class="subtitle">상품·계좌·가게 설정 편집</p>
-      <a href="order-form.html" class="preview-link" target="_blank">📱 주문폼 미리보기</a>
+      <div class="header-actions">
+        <a href="index.html" class="preview-link" target="_blank">📱 주문폼 미리보기</a>
+        <button class="copy-link-btn" onclick="copyOrderFormUrl()">🔗 주문폼 URL 복사</button>
+      </div>
       <button class="logout-btn" onclick="logout()">로그아웃</button>
     </div>
 
@@ -659,14 +740,20 @@
     <!-- Products -->
     <div class="card">
       <div class="card-title"><span class="icon">📦</span> 상품 목록</div>
+      <div class="low-stock-banner" id="lowStockBanner"></div>
       <div class="product-header">
         <div>상품명</div>
-        <div style="text-align:right;">가격</div>
-        <div class="col-toggle">판매중</div>
+        <div>가격</div>
+        <div>재고</div>
+        <div class="col-toggle">판매</div>
         <div class="col-action"></div>
       </div>
       <div id="productsContainer"></div>
       <button class="add-btn" onclick="addProduct()">＋ 상품 추가</button>
+      <div style="margin-top:10px; font-size:11.5px; color:var(--color-text-sub); line-height:1.5;">
+        💡 <strong>재고</strong>: 비우면 무제한, 숫자 입력 시 주문마다 자동 차감 (5개 이하면 폼에서 "🔥 마지막 N개" 표시)<br>
+        💡 <strong>이미지</strong>: 인스타 게시물 등 외부 URL 붙여넣기 (선택, 비어도 정상)
+      </div>
     </div>
   </div>
 </div>
@@ -885,27 +972,51 @@ function renderSettings() {
 }
 
 /* ============================================
-   상품 렌더링
+   상품 렌더링 (재고 + 이미지URL 포함)
    ============================================ */
 function renderProducts() {
   const container = document.getElementById('productsContainer');
   container.innerHTML = '';
 
+  let lowStockCount = 0;
+
   currentProducts.forEach((product, i) => {
+    // 재고 정규화 — null/'' = 무제한
+    const stockRaw = product.stock;
+    const stockNum = (stockRaw === null || stockRaw === undefined || stockRaw === '')
+      ? null
+      : Number(stockRaw);
+    const isLowStock = stockNum !== null && stockNum <= 5;
+    if (isLowStock && product.active !== false) lowStockCount++;
+
     const row = document.createElement('div');
     row.className = 'product-row';
     row.innerHTML = `
-      <input type="text" data-field="name" placeholder="상품명" value="${escapeAttr(product.name)}">
-      <input type="number" data-field="price" placeholder="0" value="${product.price || 0}">
-      <div class="toggle">
-        <input type="checkbox" data-field="active" ${product.active !== false ? 'checked' : ''}>
+      <div class="product-row-main">
+        <input type="text" data-field="name" placeholder="상품명" value="${escapeAttr(product.name)}">
+        <input type="number" data-field="price" placeholder="0" value="${product.price || 0}">
+        <input type="number" data-field="stock" placeholder="∞" value="${stockNum === null ? '' : stockNum}"
+               class="${isLowStock ? 'low-stock' : ''}">
+        <div class="toggle">
+          <input type="checkbox" data-field="active" ${product.active !== false ? 'checked' : ''}>
+        </div>
+        <button class="delete-btn" title="삭제">🗑</button>
       </div>
-      <button class="delete-btn" title="삭제">🗑</button>
+      <div class="product-row-image">
+        <span class="image-label">🖼 이미지</span>
+        <input type="url" data-field="imageUrl" placeholder="https://... (선택)"
+               value="${escapeAttr(product.imageUrl || '')}">
+        ${product.imageUrl
+          ? `<img class="image-preview" src="${escapeAttr(product.imageUrl)}" alt="" onerror="this.style.display='none'">`
+          : ''}
+      </div>
     `;
 
     const nameInput = row.querySelector('[data-field="name"]');
     const priceInput = row.querySelector('[data-field="price"]');
+    const stockInput = row.querySelector('[data-field="stock"]');
     const activeInput = row.querySelector('[data-field="active"]');
+    const imageInput = row.querySelector('[data-field="imageUrl"]');
     const deleteBtn = row.querySelector('.delete-btn');
 
     nameInput.addEventListener('input', () => {
@@ -918,8 +1029,24 @@ function renderProducts() {
       markChanged(priceInput, i, 'price');
       updateDirty();
     });
+    stockInput.addEventListener('input', () => {
+      const v = stockInput.value;
+      currentProducts[i].stock = (v === '' ? null : Number(v));
+      markChanged(stockInput, i, 'stock');
+      // 즉시 low-stock 스타일 갱신
+      const s = currentProducts[i].stock;
+      stockInput.classList.toggle('low-stock', s !== null && s <= 5);
+      updateLowStockBanner();
+      updateDirty();
+    });
     activeInput.addEventListener('change', () => {
       currentProducts[i].active = activeInput.checked;
+      updateLowStockBanner();
+      updateDirty();
+    });
+    imageInput.addEventListener('input', () => {
+      currentProducts[i].imageUrl = imageInput.value;
+      markChanged(imageInput, i, 'imageUrl');
       updateDirty();
     });
     deleteBtn.addEventListener('click', () => {
@@ -931,23 +1058,68 @@ function renderProducts() {
 
     container.appendChild(row);
   });
+
+  updateLowStockBanner();
+}
+
+function updateLowStockBanner() {
+  const banner = document.getElementById('lowStockBanner');
+  if (!banner) return;
+  const lowItems = currentProducts.filter(p => {
+    if (p.active === false) return false;
+    const s = (p.stock === null || p.stock === undefined || p.stock === '') ? null : Number(p.stock);
+    return s !== null && s <= 5;
+  });
+  if (lowItems.length > 0) {
+    const names = lowItems.map(p => `"${p.name}" (${p.stock}개)`).join(', ');
+    banner.textContent = `⚠️ 재고 부족 ${lowItems.length}개: ${names}`;
+    banner.classList.add('show');
+  } else {
+    banner.classList.remove('show');
+  }
 }
 
 function markChanged(input, idx, field) {
   const orig = originalProducts[idx];
-  const changed = !orig || String(currentProducts[idx][field]) !== String(orig[field]);
+  const cur = currentProducts[idx][field];
+  const orgVal = orig ? orig[field] : undefined;
+  // null/undefined/'' 는 모두 "비어있음"으로 같다고 취급
+  const isEmpty = v => v === null || v === undefined || v === '';
+  const changed = !orig || (isEmpty(cur) !== isEmpty(orgVal)) || String(cur ?? '') !== String(orgVal ?? '');
   input.classList.toggle('changed', changed);
 }
 
 function addProduct() {
-  currentProducts.push({ name: '', price: 0, active: true });
+  currentProducts.push({ name: '', price: 0, active: true, stock: null, imageUrl: '' });
   renderProducts();
   updateDirty();
-  // 새로 추가된 상품의 이름 칸으로 포커스
   setTimeout(() => {
     const inputs = document.querySelectorAll('#productsContainer .product-row input[data-field="name"]');
     inputs[inputs.length - 1]?.focus();
   }, 50);
+}
+
+/* ============================================
+   주문폼 URL 복사
+   ============================================ */
+function copyOrderFormUrl() {
+  // 현재 페이지 기준 상대경로 → 절대 URL 변환
+  const url = new URL('./', window.location.href).href;
+  const doToast = () => showToast('✅ 복사됨: ' + url, 'success');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(doToast).catch(fallbackCopy);
+  } else {
+    fallbackCopy();
+  }
+  function fallbackCopy() {
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    doToast();
+  }
 }
 
 /* ============================================
