@@ -751,7 +751,7 @@
       <div id="productsContainer"></div>
       <button class="add-btn" onclick="addProduct()">＋ 상품 추가</button>
       <div style="margin-top:10px; font-size:11.5px; color:var(--color-text-sub); line-height:1.6;">
-        💡 <strong>재고</strong>: 비우면 무제한, 숫자 입력 시 주문마다 자동 차감 (5개 이하면 폼에서 "🔥 마지막 N개" 표시)<br>
+        💡 <strong>재고</strong>: 비우면 무제한, 숫자 입력 시 주문마다 자동 차감 (20개 이하면 폼에서 "N개 남음" 빨강 펄스 배지 표시)<br>
         💡 <strong>브랜드</strong>: 카드 상단에 작게 표시 (예: "배플루언서 농가직송")<br>
         💡 <strong>설명</strong>: 상품 상세 페이지에 표시되는 한 줄 (예: "당도 14브릭스 이상")<br>
         💡 <strong>이미지</strong>: 인스타 게시물 등 외부 URL 붙여넣기 (모두 선택, 비어도 정상)
@@ -778,6 +778,9 @@
 const CONFIG = {
   scriptUrl: "https://script.google.com/macros/s/AKfycbx_UczNFBjwXLVb5ahgkQHFNoWo-LPCcKJLAqbh6k9TVRg03KFW0W7WR3mhbTQSyt91/exec"
 };
+
+// 재고 부족 경고 임계값 — 손님 폼의 "🔥 마지막 N개" 펄스 배지 임계값과 일치
+const LOW_STOCK_THRESHOLD = 20;
 
 // 설정 항목 정의 (순서 = 표시 순서, key = 시트의 A열 키와 일치)
 const SETTING_FIELDS = [
@@ -988,7 +991,7 @@ function renderProducts() {
     const stockNum = (stockRaw === null || stockRaw === undefined || stockRaw === '')
       ? null
       : Number(stockRaw);
-    const isLowStock = stockNum !== null && stockNum <= 5;
+    const isLowStock = stockNum !== null && stockNum <= LOW_STOCK_THRESHOLD;
     if (isLowStock && product.active !== false) lowStockCount++;
 
     const row = document.createElement('div');
@@ -1048,7 +1051,7 @@ function renderProducts() {
       currentProducts[i].stock = (v === '' ? null : Number(v));
       markChanged(stockInput, i, 'stock');
       const s = currentProducts[i].stock;
-      stockInput.classList.toggle('low-stock', s !== null && s <= 5);
+      stockInput.classList.toggle('low-stock', s !== null && s <= LOW_STOCK_THRESHOLD);
       updateLowStockBanner();
       updateDirty();
     });
@@ -1091,7 +1094,7 @@ function updateLowStockBanner() {
   const lowItems = currentProducts.filter(p => {
     if (p.active === false) return false;
     const s = (p.stock === null || p.stock === undefined || p.stock === '') ? null : Number(p.stock);
-    return s !== null && s <= 5;
+    return s !== null && s <= LOW_STOCK_THRESHOLD;
   });
   if (lowItems.length > 0) {
     const names = lowItems.map(p => `"${p.name}" (${p.stock}개)`).join(', ');

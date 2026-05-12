@@ -2113,6 +2113,9 @@ function guessEmoji(name) {
   return '🛒';
 }
 
+/* 재고 부족 경고 임계값 — 이 수치 이하면 "🔥 마지막 N개" 펄스 배지 표시 */
+const LOW_STOCK_THRESHOLD = 20;
+
 /* 마켓 그리드 렌더링 */
 function renderMarketGrid() {
   const grid = document.getElementById('productGrid');
@@ -2121,7 +2124,7 @@ function renderMarketGrid() {
   SHOP.products.forEach((p, i) => {
     const stock = getStock(p);
     const isOut = stock !== null && stock <= 0;
-    const isLow = stock !== null && stock > 0 && stock <= 5;
+    const isLow = stock !== null && stock > 0 && stock <= LOW_STOCK_THRESHOLD;
 
     const card = document.createElement('div');
     card.className = 'product-card' + (isOut ? ' sold-out' : '');
@@ -2130,7 +2133,7 @@ function renderMarketGrid() {
     if (isOut) {
       badgeHtml = '<span class="card-badge sold-out-badge">품절</span>';
     } else if (isLow) {
-      badgeHtml = `<span class="card-badge low-stock-badge">🔥 ${stock}개</span>`;
+      badgeHtml = `<span class="card-badge low-stock-badge">${stock}개 남음</span>`;
     }
 
     const imageHtml = p.imageUrl
@@ -2162,7 +2165,7 @@ function renderDetail(p) {
   if (!p) return;
   const stock = getStock(p);
   const isOut = stock !== null && stock <= 0;
-  const isLow = stock !== null && stock > 0 && stock <= 5;
+  const isLow = stock !== null && stock > 0 && stock <= LOW_STOCK_THRESHOLD;
 
   // 이미지
   const detailImage = document.getElementById('detailImage');
@@ -2177,7 +2180,7 @@ function renderDetail(p) {
     inner = `<div class="fallback-emoji">${guessEmoji(p.name)}</div>`;
   }
   if (isOut) inner += '<span class="detail-badge sold-out-badge">품절</span>';
-  else if (isLow) inner += `<span class="detail-badge low-stock-badge">🔥 마지막 ${stock}개</span>`;
+  else if (isLow) inner += `<span class="detail-badge low-stock-badge">${stock}개 남음</span>`;
   detailImage.innerHTML = inner;
 
   // 텍스트
