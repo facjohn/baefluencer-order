@@ -317,31 +317,73 @@
     }
 
     /* ─────────── 주문 조회 섹션 (페이지 하단) ─────────── */
-    .lookup-divider {
+    /* 강한 섹션 구분선 — 대시 패턴 + 중앙 칩 */
+    .section-break {
       position: relative;
+      margin: 56px 0 22px;
+      height: 40px;
       text-align: center;
-      margin: 40px 0 18px;
-      color: var(--color-text-sub);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 1px;
     }
-    .lookup-divider::before,
-    .lookup-divider::after {
+    .section-break::before,
+    .section-break::after {
       content: '';
       position: absolute;
       top: 50%;
-      width: calc(50% - 36px);
-      height: 1px;
-      background: var(--color-border);
+      width: calc(50% - 96px);
+      height: 2px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--color-primary) 0,
+        var(--color-primary) 5px,
+        transparent 5px,
+        transparent 10px
+      );
+      opacity: 0.55;
     }
-    .lookup-divider::before { left: 0; }
-    .lookup-divider::after { right: 0; }
-    .lookup-card .card-subtitle {
+    .section-break::before { left: 0; }
+    .section-break::after  { right: 0; }
+    .section-break-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--color-primary);
+      color: white;
+      padding: 9px 20px;
+      border-radius: 999px;
+      font-size: 13.5px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      box-shadow: 0 4px 14px rgba(27, 107, 42, 0.28);
+      position: relative;
+      z-index: 1;
+      top: 2px;
+      white-space: nowrap;
+    }
+    .section-break-chip .chip-icon { font-size: 15px; }
+    /* 안내 헤더 — 칩 아래 부드러운 문구 */
+    .lookup-intro {
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .lookup-intro .title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      letter-spacing: -0.5px;
+      margin-bottom: 2px;
+    }
+    .lookup-intro .subtitle {
       font-size: 12.5px;
       color: var(--color-text-sub);
-      margin-top: -10px;
-      margin-bottom: 16px;
+      font-weight: 500;
+    }
+    /* 조회 카드 — 메인 폼과 구별되는 살짝 다른 톤 */
+    .lookup-card {
+      background: linear-gradient(135deg, #FFFFFF 0%, #FAFAF5 100%);
+      border: 1.5px solid var(--color-primary-light);
+    }
+    .lookup-card .card-subtitle {
+      display: none;  /* 위 lookup-intro 가 대신 안내함 */
     }
     .lookup-error {
       display: none;
@@ -355,6 +397,13 @@
       margin-top: 10px;
     }
     .lookup-error.show { display: block; }
+    .lookup-hint {
+      font-size: 11.5px;
+      color: var(--color-text-sub);
+      margin-top: 5px;
+      font-weight: 500;
+      letter-spacing: -0.1px;
+    }
     /* 조회 결과 카드 */
     .lookup-result {
       display: none;
@@ -688,15 +737,215 @@
       color: var(--color-text-sub);
       line-height: 1.7;
     }
-    .success-screen .order-id {
-      display: inline-block;
+    /* 주문번호 — 단순 표시 (복사 버튼 제거됨, 시선은 입금 카드에 집중) */
+    .success-screen .order-id-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       background: var(--color-primary-light);
-      padding: 8px 16px;
+      padding: 6px 14px;
       border-radius: 8px;
+      margin: 14px 0 4px;
+      border: 1px solid rgba(27,107,42,0.2);
+    }
+    .success-screen .order-id {
       font-weight: 700;
       color: var(--color-primary-dark);
-      margin: 16px 0;
-      font-size: 15px;
+      font-size: 14px;
+      letter-spacing: -0.2px;
+    }
+    /* 스크린샷 안내 — 작은 핀 (살짝 강조) */
+    .success-screen .order-id-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #FFF8F2;
+      border: 1px solid var(--color-accent-light);
+      border-radius: 999px;
+      padding: 5px 12px;
+      margin: 6px 0 16px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #B45309;
+      letter-spacing: -0.2px;
+    }
+    .success-screen .order-id-hint .camera-icon {
+      display: inline-block;
+      font-size: 13px;
+      animation: cameraShake 2s ease-in-out infinite;
+      transform-origin: center;
+    }
+    @keyframes cameraShake {
+      0%, 60%, 100% { transform: rotate(0) scale(1); }
+      65% { transform: rotate(-18deg) scale(1.15); }
+      70% { transform: rotate(18deg) scale(1.15); }
+      75% { transform: rotate(-10deg) scale(1.08); }
+      80% { transform: rotate(10deg) scale(1.08); }
+      85% { transform: rotate(0) scale(1); }
+    }
+
+    /* ─────────── 입금 안내 카드 (가장 강조) ─────────── */
+    .payment-card {
+      max-width: 360px;
+      margin: 8px auto 8px;
+      background: linear-gradient(135deg, #FFFFFF 0%, #FFFAF5 100%);
+      border: 2.5px solid var(--color-accent);
+      border-radius: 18px;
+      padding: 18px 16px;
+      box-shadow: 0 6px 24px rgba(232, 114, 42, 0.22);
+      animation: paymentCardGlow 2.4s ease-in-out infinite;
+      position: relative;
+    }
+    @keyframes paymentCardGlow {
+      0%, 100% {
+        box-shadow: 0 6px 24px rgba(232, 114, 42, 0.22),
+                    0 0 0 0 rgba(232, 114, 42, 0.5);
+      }
+      50% {
+        box-shadow: 0 8px 30px rgba(232, 114, 42, 0.35),
+                    0 0 0 10px rgba(232, 114, 42, 0);
+      }
+    }
+    .payment-card .payment-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 14.5px;
+      font-weight: 900;
+      color: var(--color-accent);
+      letter-spacing: -0.4px;
+      text-align: center;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 2px dashed var(--color-accent-light);
+    }
+    .pulse-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--color-error);
+      border-radius: 50%;
+      animation: pulseDot 1s ease-in-out infinite;
+    }
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+      50%      { transform: scale(1.3); box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
+    }
+
+    /* 입금 금액 박스 — 오렌지 그라데이션, 펄스 */
+    .success-amount {
+      margin: 0 0 12px;
+      background: linear-gradient(135deg, #E8722A 0%, #D6601A 100%);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: white;
+      box-shadow: 0 4px 14px rgba(232, 114, 42, 0.4);
+    }
+    .success-amount .label {
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0.95;
+      letter-spacing: -0.2px;
+    }
+    .success-amount .amount {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      animation: amountTextPulse 1.5s ease-in-out infinite;
+      display: inline-block;
+    }
+    @keyframes amountTextPulse {
+      0%, 100% { transform: scale(1); text-shadow: 0 0 0 transparent; }
+      50%      { transform: scale(1.08); text-shadow: 0 0 16px rgba(255,255,255,0.7); }
+    }
+
+    /* 계좌 정보 박스 — 강조 + 큰 복사 버튼 */
+    .success-bank {
+      margin: 0 0 12px;
+      background: white;
+      border: 2px solid var(--color-accent);
+      border-radius: 12px;
+      padding: 14px 14px 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: 0 2px 10px rgba(232, 114, 42, 0.12);
+    }
+    .success-bank .info {
+      flex: 1;
+      text-align: left;
+      min-width: 0;
+    }
+    .success-bank #successBankDisplay {
+      font-size: 16.5px;
+      font-weight: 800;
+      color: var(--color-text);
+      letter-spacing: -0.3px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.3;
+    }
+    .success-bank .holder {
+      font-size: 11.5px;
+      color: var(--color-text-sub);
+      font-weight: 600;
+      margin-top: 3px;
+    }
+    .success-bank .holder strong {
+      color: var(--color-primary-dark);
+      font-weight: 700;
+    }
+    .success-bank .copy-btn.big-copy {
+      background: linear-gradient(135deg, var(--color-accent) 0%, #D6601A 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      flex-shrink: 0;
+      letter-spacing: -0.2px;
+      box-shadow: 0 4px 12px rgba(232, 114, 42, 0.4);
+      animation: copyBtnBounce 1.8s ease-in-out infinite;
+      white-space: nowrap;
+    }
+    @keyframes copyBtnBounce {
+      0%, 55%, 100% { transform: translateY(0) scale(1); }
+      65%           { transform: translateY(-5px) scale(1.07); }
+      75%           { transform: translateY(0) scale(1); }
+      85%           { transform: translateY(-2px) scale(1.03); }
+    }
+    .success-bank .copy-btn.big-copy:active {
+      transform: scale(0.93);
+      animation: none;
+    }
+
+    /* 입금 확인 안내 — 노란 워닝 띠 */
+    .payment-notice {
+      background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+      border: 1.5px solid #F59E0B;
+      color: #92400E;
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      animation: noticePulse 2.2s ease-in-out infinite;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+    }
+    @keyframes noticePulse {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.025); }
     }
     .success-bank {
       max-width: 340px;
@@ -1251,20 +1500,35 @@
   <div class="success-screen" id="successScreen">
     <div class="check">✅</div>
     <h2>주문이 완료되었습니다!</h2>
-    <div class="order-id" id="orderId"></div>
-    <p style="margin-bottom:8px;">주문해 주셔서 감사합니다.</p>
-    <div class="success-amount">
-      <span class="label">입금 금액</span>
-      <span class="amount" id="successAmount"></span>
+    <div class="order-id-wrapper">
+      <span class="order-id" id="orderId"></span>
     </div>
-    <div class="success-bank">
-      <div class="info">
-        <div id="successBankDisplay"></div>
-        <div class="holder">예금주 <strong id="successHolder"></strong></div>
+    <span class="order-id-hint">
+      <span class="camera-icon">📸</span>
+      주문번호는 나중에 조회할 때 필요해요. 스크린샷 찍어놓으세요!
+    </span>
+
+    <!-- ─────────── 입금 안내 (강조 카드) ─────────── -->
+    <div class="payment-card">
+      <div class="payment-title">
+        <span class="pulse-dot"></span>
+        💰 지금 아래 계좌로 입금해주세요
       </div>
-      <button class="copy-btn" onclick="copyAccount()">복사</button>
+      <div class="success-amount">
+        <span class="label">입금 금액</span>
+        <span class="amount" id="successAmount"></span>
+      </div>
+      <div class="success-bank">
+        <div class="info">
+          <div id="successBankDisplay"></div>
+          <div class="holder">예금주 <strong id="successHolder"></strong></div>
+        </div>
+        <button class="copy-btn big-copy" onclick="copyAccount()">📋 계좌 복사</button>
+      </div>
+      <div class="payment-notice">
+        ⏰ 입금 확인 후 순차적으로 발송됩니다
+      </div>
     </div>
-    <p style="margin-top:18px;">입금 확인 후 순차적으로 발송됩니다.</p>
     <a class="order-status-link" id="orderStatusLink" href="#lookupSection" onclick="openLookupFromSuccess(event)">
       📋 내 주문 상태 확인하기
     </a>
@@ -1290,18 +1554,28 @@
 
   <!-- ─────────── 주문 조회 섹션 (페이지 하단, 항상 표시) ─────────── -->
   <div id="lookupSection">
-    <div class="lookup-divider">OR</div>
+    <div class="section-break">
+      <span class="section-break-chip">
+        <span class="chip-icon">🔍</span>
+        이미 주문하셨다면
+      </span>
+    </div>
+    <div class="lookup-intro">
+      <div class="title">📋 내 주문 조회</div>
+      <div class="subtitle">주문번호와 휴대폰 뒷 4자리로 상태를 확인할 수 있어요</div>
+    </div>
     <div class="card lookup-card">
-      <div class="card-title"><span class="icon">📋</span> 내 주문 조회</div>
-      <div class="card-subtitle">이미 주문하셨나요? 주문번호로 상태를 확인할 수 있어요</div>
       <div class="field">
         <label>주문번호</label>
-        <input type="text" id="lookupOrderId" placeholder="예: 2026-04-29-1" autocomplete="off">
+        <input type="text" id="lookupOrderId" placeholder="예: 2026-04-29-1" autocomplete="off"
+               oninput="autoFormatOrderId(this)">
+        <div class="lookup-hint">주문 완료 시 받은 번호 · 하이픈 없이 입력해도 OK</div>
       </div>
       <div class="field">
         <label>휴대폰 뒷 4자리</label>
         <input type="tel" id="lookupPhone" placeholder="0000" maxlength="4" inputmode="numeric"
                oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        <div class="lookup-hint">주문할 때 입력한 연락처의 마지막 4자리</div>
       </div>
       <button class="submit-btn" id="lookupBtn" onclick="lookupOrder()">조회하기</button>
       <div class="lookup-error" id="lookupError"></div>
@@ -1857,12 +2131,62 @@ function showLookupError(msg) {
   setTimeout(() => box.classList.remove('show'), 5000);
 }
 
+/* 주문번호 자동 포맷팅 (사용자 입력 중 실시간)
+   - 사용자가 하이픈/점/공백 같은 구분자를 직접 입력 중이면 건드리지 않음
+   - 숫자만 입력하면 자동으로 YYYY-MM-DD-N 형태로 변환 */
+function autoFormatOrderId(input) {
+  const raw = input.value;
+  // 이미 구분자가 들어가 있으면 사용자 입력 그대로 유지
+  if (/[-.\/\s_]/.test(raw)) return;
+  const digits = raw.replace(/[^0-9]/g, '');
+  if (digits.length < 5) return;  // 5자리 이상 입력해야 자동 포맷 시작
+  let formatted;
+  if (digits.length <= 6) {
+    formatted = digits.slice(0, 4) + '-' + digits.slice(4);
+  } else if (digits.length <= 8) {
+    formatted = digits.slice(0, 4) + '-' + digits.slice(4, 6) + '-' + digits.slice(6);
+  } else {
+    formatted = digits.slice(0, 4) + '-' + digits.slice(4, 6) + '-' + digits.slice(6, 8) + '-' + digits.slice(8, 14);
+  }
+  input.value = formatted;
+}
+
+/* 주문번호 정규화 — 다양한 입력 형식을 표준 형식(YYYY-MM-DD-N)으로 변환
+   허용: "2026-04-29-1", "2026.04.29.1", "2026 04 29 1", "20260429-1", "202604291", "2026-4-29-1" */
+function normalizeOrderId(raw) {
+  const trimmed = String(raw || '').trim();
+  if (!trimmed) return '';
+  // 숫자 부분만 분리 (구분자 무관)
+  const parts = trimmed.split(/[^0-9]+/).filter(Boolean);
+  // 4부분으로 깔끔하게 나뉘면 → 각 부분 zero-pad
+  if (parts.length === 4) {
+    return `${parts[0].padStart(4, '0')}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}-${parts[3]}`;
+  }
+  // 8자리 + 순번 (YYYYMMDD-N 형태)
+  if (parts.length === 2 && parts[0].length === 8) {
+    return `${parts[0].slice(0, 4)}-${parts[0].slice(4, 6)}-${parts[0].slice(6, 8)}-${parts[1]}`;
+  }
+  // 한 덩어리 숫자 9자리 이상 (YYYYMMDDN)
+  if (parts.length === 1 && parts[0].length >= 9) {
+    const d = parts[0];
+    return `${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}-${d.slice(8)}`;
+  }
+  // 변환 못함 — 원본 그대로 (서버에서 검증)
+  return trimmed;
+}
+
 async function lookupOrder() {
-  const orderId = document.getElementById('lookupOrderId').value.trim();
+  const rawInput = document.getElementById('lookupOrderId').value;
+  const orderId = normalizeOrderId(rawInput);
   const phoneLast4 = document.getElementById('lookupPhone').value.trim();
 
   if (!orderId) { showLookupError('주문번호를 입력해주세요'); return; }
   if (phoneLast4.length !== 4) { showLookupError('휴대폰 뒷 4자리를 정확히 입력해주세요'); return; }
+
+  // 정규화 결과가 원본과 다르면 입력칸도 표준 형식으로 갱신 (사용자가 확인 가능하도록)
+  if (orderId !== rawInput.trim()) {
+    document.getElementById('lookupOrderId').value = orderId;
+  }
 
   const btn = document.getElementById('lookupBtn');
   btn.disabled = true;
@@ -1887,6 +2211,33 @@ async function lookupOrder() {
   } finally {
     btn.disabled = false;
     btn.classList.remove('loading');
+  }
+}
+
+/* 주문 완료 화면의 주문번호 복사 버튼 */
+function copyOrderId() {
+  const orderId = document.getElementById('orderId').textContent.trim();
+  if (!orderId) return;
+  const onCopied = () => {
+    const btn = document.querySelector('.copy-id-btn');
+    if (!btn) return;
+    const original = btn.textContent;
+    btn.textContent = '✓ 복사됨!';
+    setTimeout(() => { btn.textContent = original; }, 1500);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(orderId).then(onCopied).catch(fallback);
+  } else {
+    fallback();
+  }
+  function fallback() {
+    const ta = document.createElement('textarea');
+    ta.value = orderId;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    onCopied();
   }
 }
 
