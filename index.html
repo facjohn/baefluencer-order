@@ -187,7 +187,7 @@
     input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px rgba(27,107,42,0.1);
+      box-shadow: 0 0 0 3px rgba(52,106,255,0.12);
     }
     input::placeholder, textarea::placeholder {
       color: #C0C0C0;
@@ -692,7 +692,7 @@
       font-size: 13.5px;
       font-weight: 800;
       letter-spacing: -0.3px;
-      box-shadow: 0 4px 14px rgba(27, 107, 42, 0.28);
+      box-shadow: 0 4px 14px rgba(52, 106, 255, 0.28);
       position: relative;
       z-index: 1;
       top: 2px;
@@ -1087,7 +1087,7 @@
       padding: 6px 14px;
       border-radius: 8px;
       margin: 14px 0 4px;
-      border: 1px solid rgba(27,107,42,0.2);
+      border: 1px solid rgba(52,106,255,0.25);
     }
     .success-screen .order-id {
       font-weight: 700;
@@ -1288,34 +1288,6 @@
       0%, 100% { transform: scale(1); }
       50%      { transform: scale(1.025); }
     }
-    .success-bank {
-      max-width: 340px;
-      margin: 14px auto 0;
-      background: var(--color-primary-light);
-      border: 1px solid rgba(27,107,42,0.15);
-      border-radius: 10px;
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--color-primary-dark);
-    }
-    .success-bank .copy-btn {
-      background: var(--color-primary);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 6px 12px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      flex-shrink: 0;
-    }
-    .success-bank .copy-btn:active { transform: scale(0.95); }
     /* Social Follow CTA */
     .social-cta {
       margin: 36px auto 0;
@@ -1401,39 +1373,6 @@
       0%, 100% { transform: translateY(0); }
       50%      { transform: translateY(-4px); }
     }
-    .success-bank .info { flex: 1; text-align: left; }
-    .success-bank .holder {
-      font-size: 11.5px;
-      color: var(--color-text-sub);
-      font-weight: 500;
-      margin-top: 2px;
-    }
-    .success-bank .holder strong {
-      color: var(--color-primary-dark);
-      font-weight: 700;
-    }
-    .success-amount {
-      max-width: 340px;
-      margin: 14px auto 8px;
-      background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
-      border-radius: 10px;
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: white;
-    }
-    .success-amount .label {
-      font-size: 13px;
-      font-weight: 600;
-      opacity: 0.9;
-    }
-    .success-amount .amount {
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
-    }
-
     /* Error */
     .field-error {
       border-color: var(--color-error) !important;
@@ -1704,9 +1643,9 @@
   </div>
 
   <div class="header" id="shopHeader" style="display:none;">
-    <video class="header-video" autoplay loop muted playsinline preload="auto">
-      <source src="header.mp4" type="video/mp4">
-    </video>
+    <video class="header-video" src="header.mp4" autoplay loop muted playsinline preload="auto"
+           onerror="this.style.display='none'; document.getElementById('headerEmoji').style.display='block';"></video>
+    <span class="header-emoji" id="headerEmoji" style="display:none;">🍓</span>
     <h1 id="shopTitle"></h1>
     <p class="subtitle">주문해 주셔서 감사합니다</p>
   </div>
@@ -1768,7 +1707,7 @@
       <strong>💰 주문 후 아래 계좌로 입금해주세요</strong>
       <div class="bank-info">
         <span id="bankDisplay">농협 123-4567-8901-23</span>
-        <button class="copy-btn" onclick="copyAccount()">복사</button>
+        <button class="copy-btn" onclick="copyAccount(this)">복사</button>
       </div>
       <div style="margin-top:8px; font-size:12.5px; color:var(--color-text-sub);">
         ※ 입금자명이 주문자명과 다를 경우 아래에 별도 입력해주세요
@@ -1894,7 +1833,7 @@
           <div id="successBankDisplay"></div>
           <div class="holder">예금주 <strong id="successHolder"></strong></div>
         </div>
-        <button class="copy-btn big-copy" onclick="copyAccount()">📋 계좌 복사</button>
+        <button class="copy-btn big-copy" onclick="copyAccount(this)">📋 계좌 복사</button>
       </div>
       <div class="payment-notice">
         ⏰ 입금 확인 후 순차적으로 발송됩니다
@@ -1938,9 +1877,9 @@
     <div class="card lookup-card">
       <div class="field">
         <label>주문번호</label>
-        <input type="text" id="lookupOrderId" placeholder="예: 2026-04-29-1" autocomplete="off"
-               oninput="autoFormatOrderId(this)">
-        <div class="lookup-hint">주문 완료 시 받은 번호 · 하이픈 없이 입력해도 OK</div>
+        <input type="text" id="lookupOrderId" placeholder="예: 202606111" autocomplete="off"
+               inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        <div class="lookup-hint">주문번호는 숫자로만 입력해주세요 (하이픈·공백은 자동으로 지워져요)</div>
       </div>
       <div class="field">
         <label>휴대폰 뒷 4자리</label>
@@ -1991,20 +1930,16 @@ const CONFIG = {
   scriptUrl: "https://script.google.com/macros/s/AKfycbx_UczNFBjwXLVb5ahgkQHFNoWo-LPCcKJLAqbh6k9TVRg03KFW0W7WR3mhbTQSyt91/exec"
 };
 
-// 시트 로드 실패 시 fallback (로컬 테스트용)
-const FALLBACK_SHOP = {
-  shopName: "배플루언서",
-  headerEmoji: "🍓",
-  bank: { name: "농협", account: "123-4567-8901-23", holder: "현농프레쉬" },
+// 서버에서 설정을 불러오기 전의 빈 기본값.
+// ⚠️ 더미 계좌/상품이 손님에게 노출되는 사고를 막기 위해 fallback 데이터는 쓰지 않는다 —
+//    로드 실패 시 showLoadError()가 에러 화면을 표시.
+let SHOP = {
+  shopName: '',
+  headerEmoji: '🍓',
+  bank: { name: '', account: '', holder: '' },
   maxQty: 10,
-  products: [
-    { name: "설향 딸기 2kg (250g×8팩)", price: 35000 },
-    { name: "설향 딸기 2kg (500g×4팩)", price: 33000 },
-    { name: "설향 딸기 1.32kg (330g×4팩)", price: 25000 }
-  ]
+  products: []
 };
-
-let SHOP = FALLBACK_SHOP;
 let selectedProduct = null;
 let quantity = 1;
 
@@ -2012,7 +1947,11 @@ let quantity = 1;
    초기화 - 서버에서 설정 로드 후 렌더링
    ============================================ */
 async function init() {
-  await loadConfig();
+  const loaded = await loadConfig();
+  if (!loaded) {
+    showLoadError();
+    return;
+  }
   renderShop();
   bindSenderSync();
   document.getElementById('loadingScreen').classList.add('hidden');
@@ -2020,6 +1959,21 @@ async function init() {
   // 마켓 뷰로 시작
   showView('market');
   setupHistoryRouting();
+}
+
+/* 설정 로드 실패 화면 — 가짜 계좌가 노출되는 것보다 솔직한 에러가 안전 */
+function showLoadError() {
+  const screen = document.getElementById('loadingScreen');
+  screen.innerHTML = `
+    <div style="font-size:48px; margin-bottom:14px;">😢</div>
+    <h2 style="font-size:18px; font-weight:800; color:var(--color-text); margin-bottom:6px;">주문폼을 불러오지 못했어요</h2>
+    <p style="margin-bottom:22px;">일시적인 네트워크 문제일 수 있어요.<br>잠시 후 아래 버튼을 눌러주세요.</p>
+    <button onclick="location.reload()"
+            style="padding:13px 28px; background:var(--color-primary); color:white; border:none;
+                   border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit;">
+      🔄 다시 시도
+    </button>
+  `;
 }
 
 /* 현재 view 상태 */
@@ -2058,6 +2012,9 @@ function showViewInternal(viewName) {
     const el = document.getElementById('view' + v.charAt(0).toUpperCase() + v.slice(1));
     if (el) el.classList.toggle('hidden', v !== viewName);
   });
+  // 주문 조회 섹션은 첫 화면(마켓)·주문 완료 화면에서만 표시 — 상품 상세/주문 폼에서는 숨김
+  const lookup = document.getElementById('lookupSection');
+  if (lookup) lookup.style.display = (viewName === 'detail' || viewName === 'form') ? 'none' : '';
   // 성공 화면은 별도 처리
   const success = document.getElementById('successScreen');
   if (viewName !== 'success' && success) success.classList.remove('show');
@@ -2121,6 +2078,11 @@ function renderMarketGrid() {
   const grid = document.getElementById('productGrid');
   if (!grid) return;
   grid.innerHTML = '';
+  if (SHOP.products.length === 0) {
+    grid.innerHTML =
+      '<div style="grid-column:1/-1; text-align:center; padding:48px 0; color:var(--color-text-sub); font-size:14px; font-weight:600;">😴 현재 판매 중인 상품이 없습니다</div>';
+    return;
+  }
   SHOP.products.forEach((p, i) => {
     const stock = getStock(p);
     const isOut = stock !== null && stock <= 0;
@@ -2237,32 +2199,36 @@ function renderFormSummary(p) {
   `;
 }
 
+/* 서버 설정 로드. 성공 시 true, 실패 시 false (호출부에서 에러 화면 처리) */
 async function loadConfig() {
   if (!CONFIG.scriptUrl || CONFIG.scriptUrl === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
-    console.log('scriptUrl 미설정 - fallback 사용');
-    return;
+    console.error('scriptUrl 미설정');
+    return false;
   }
   try {
-    // 8초 타임아웃 — 응답 안 오면 fallback 으로 폼 표시
+    // 8초 타임아웃
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
     const r = await fetch(CONFIG.scriptUrl + '?action=getConfig', { signal: controller.signal });
     clearTimeout(timeoutId);
     if (!r.ok) throw new Error('서버 응답 ' + r.status);
     const data = await r.json();
-    if (data && Array.isArray(data.products) && data.products.length > 0) {
-      SHOP = data;
-    } else {
-      console.warn('서버 데이터 비어있음 - fallback 사용');
+    if (!data || !Array.isArray(data.products) || !data.bank) {
+      throw new Error('서버 데이터 형식 오류');
     }
+    SHOP = data;  // 상품 0개여도 정상 — 마켓 그리드가 "판매 중인 상품 없음" 표시
+    return true;
   } catch (err) {
-    console.warn('설정 로드 실패, fallback 사용:', err);
+    console.error('설정 로드 실패:', err);
+    return false;
   }
 }
 
 function renderShop() {
   document.getElementById('shopTitle').textContent = SHOP.shopName;
   document.title = `주문하기 - ${SHOP.shopName}`;
+  // 헤더 영상이 없거나 로드 실패하면 video의 onerror가 이 이모지를 대신 표시
+  document.getElementById('headerEmoji').textContent = SHOP.headerEmoji || '🍓';
   document.getElementById('bankDisplay').textContent =
     `${SHOP.bank.name} ${SHOP.bank.account}`;
   // 마켓 그리드 렌더 (라디오 방식은 마켓 카드로 대체됨)
@@ -2400,24 +2366,29 @@ function toggleSender() {
 /* ============================================
    계좌번호 복사
    ============================================ */
-function copyAccount() {
+function copyAccount(btn) {
   const text = `${SHOP.bank.name} ${SHOP.bank.account} ${SHOP.bank.holder}`;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.querySelector('.copy-btn');
-    btn.textContent = '복사됨!';
-    setTimeout(() => btn.textContent = '복사', 1500);
-  }).catch(() => {
-    // Fallback
+  // 피드백은 실제로 클릭된 버튼(btn)에 표시 — querySelector로 잡으면 숨겨진 다른 복사 버튼이 걸림
+  const showCopied = () => {
+    if (!btn) return;
+    if (!btn.dataset.label) btn.dataset.label = btn.textContent;
+    btn.textContent = '✓ 복사됨!';
+    setTimeout(() => { btn.textContent = btn.dataset.label; }, 1500);
+  };
+  const fallbackCopy = () => {
     const ta = document.createElement('textarea');
     ta.value = text;
     document.body.appendChild(ta);
     ta.select();
     document.execCommand('copy');
     document.body.removeChild(ta);
-    const btn = document.querySelector('.copy-btn');
-    btn.textContent = '복사됨!';
-    setTimeout(() => btn.textContent = '복사', 1500);
-  });
+    showCopied();
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(showCopied).catch(fallbackCopy);
+  } else {
+    fallbackCopy();
+  }
 }
 
 /* ============================================
@@ -2638,6 +2609,11 @@ async function submitOrder() {
 }
 
 function showSuccess(orderId, totalPrice) {
+  // 제출 버튼 원상복구 — 뒤로가기로 폼에 돌아왔을 때 추가 주문이 가능하도록
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = false;
+  submitBtn.classList.remove('loading');
+
   document.getElementById('orderId').textContent = orderId;
   document.getElementById('successBankDisplay').textContent =
     `${SHOP.bank.name} ${SHOP.bank.account}`;
@@ -2672,48 +2648,11 @@ function showLookupError(msg) {
   setTimeout(() => box.classList.remove('show'), 5000);
 }
 
-/* 주문번호 자동 포맷팅 (사용자 입력 중 실시간)
-   - 사용자가 하이픈/점/공백 같은 구분자를 직접 입력 중이면 건드리지 않음
-   - 숫자만 입력하면 자동으로 YYYY-MM-DD-N 형태로 변환 */
-function autoFormatOrderId(input) {
-  const raw = input.value;
-  // 이미 구분자가 들어가 있으면 사용자 입력 그대로 유지
-  if (/[-.\/\s_]/.test(raw)) return;
-  const digits = raw.replace(/[^0-9]/g, '');
-  if (digits.length < 5) return;  // 5자리 이상 입력해야 자동 포맷 시작
-  let formatted;
-  if (digits.length <= 6) {
-    formatted = digits.slice(0, 4) + '-' + digits.slice(4);
-  } else if (digits.length <= 8) {
-    formatted = digits.slice(0, 4) + '-' + digits.slice(4, 6) + '-' + digits.slice(6);
-  } else {
-    formatted = digits.slice(0, 4) + '-' + digits.slice(4, 6) + '-' + digits.slice(6, 8) + '-' + digits.slice(8, 14);
-  }
-  input.value = formatted;
-}
-
-/* 주문번호 정규화 — 다양한 입력 형식을 표준 형식(YYYY-MM-DD-N)으로 변환
-   허용: "2026-04-29-1", "2026.04.29.1", "2026 04 29 1", "20260429-1", "202604291", "2026-4-29-1" */
+/* 주문번호 정규화 — 숫자만 추출.
+   신형 주문번호는 숫자뿐이고(예: 202606111), 구형(2026-04-29-1)을 복사해 붙여도
+   하이픈이 제거된 숫자로 서버에서 매칭된다 */
 function normalizeOrderId(raw) {
-  const trimmed = String(raw || '').trim();
-  if (!trimmed) return '';
-  // 숫자 부분만 분리 (구분자 무관)
-  const parts = trimmed.split(/[^0-9]+/).filter(Boolean);
-  // 4부분으로 깔끔하게 나뉘면 → 각 부분 zero-pad
-  if (parts.length === 4) {
-    return `${parts[0].padStart(4, '0')}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}-${parts[3]}`;
-  }
-  // 8자리 + 순번 (YYYYMMDD-N 형태)
-  if (parts.length === 2 && parts[0].length === 8) {
-    return `${parts[0].slice(0, 4)}-${parts[0].slice(4, 6)}-${parts[0].slice(6, 8)}-${parts[1]}`;
-  }
-  // 한 덩어리 숫자 9자리 이상 (YYYYMMDDN)
-  if (parts.length === 1 && parts[0].length >= 9) {
-    const d = parts[0];
-    return `${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}-${d.slice(8)}`;
-  }
-  // 변환 못함 — 원본 그대로 (서버에서 검증)
-  return trimmed;
+  return String(raw || '').replace(/[^0-9]/g, '');
 }
 
 async function lookupOrder() {
@@ -2722,9 +2661,10 @@ async function lookupOrder() {
   const phoneLast4 = document.getElementById('lookupPhone').value.trim();
 
   if (!orderId) { showLookupError('주문번호를 입력해주세요'); return; }
+  if (orderId.length < 9) { showLookupError('주문번호를 다시 확인해주세요 (숫자 9자리 이상이에요)'); return; }
   if (phoneLast4.length !== 4) { showLookupError('휴대폰 뒷 4자리를 정확히 입력해주세요'); return; }
 
-  // 정규화 결과가 원본과 다르면 입력칸도 표준 형식으로 갱신 (사용자가 확인 가능하도록)
+  // 하이픈 등이 섞여 있었으면 입력칸도 숫자만으로 갱신
   if (orderId !== rawInput.trim()) {
     document.getElementById('lookupOrderId').value = orderId;
   }
@@ -2845,7 +2785,7 @@ function fillLookupFromUrl() {
   if (id) {
     const input = document.getElementById('lookupOrderId');
     if (input) {
-      input.value = id;
+      input.value = String(id).replace(/[^0-9]/g, '');
       setTimeout(() => document.getElementById('lookupPhone')?.focus(), 300);
     }
   }
