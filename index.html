@@ -6,10 +6,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>주문하기 - 배플루언서</title>
   <meta name="description" content="배플루언서 농가직송 주문 페이지 — 주문 후 안내 계좌로 입금하시면 순차 발송됩니다.">
-  <!-- 카카오톡·인스타 DM 공유 미리보기 (og:image는 배포 URL 확정 후 절대경로로 추가 권장) -->
+  <!-- 카카오톡·인스타 DM 공유 미리보기 (og-image.jpg를 index.html과 같은 폴더에 함께 배포할 것) -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="🍓 배플루언서 주문하기">
   <meta property="og:description" content="농가직송 새벽수확 — 주문폼에서 바로 주문하세요.">
+  <meta property="og:url" content="https://baefluencer.com/">
+  <meta property="og:image" content="https://baefluencer.com/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:locale" content="ko_KR">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
@@ -463,6 +467,105 @@
       opacity: 0.9;
       letter-spacing: -0.2px;
     }
+    /* ─────────── 장바구니 ─────────── */
+    .cta-row { display: flex; gap: 8px; margin-top: 10px; align-items: stretch; }
+    .cta-row .cta-buy-btn { margin-top: 0; flex: 1; }
+    .cta-cart-btn {
+      flex-shrink: 0;
+      width: 76px;
+      background: white;
+      color: var(--color-primary);
+      border: 1.5px solid var(--color-primary);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      line-height: 1.4;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .cta-cart-btn:active { transform: scale(0.96); background: var(--color-primary-light); }
+    .cta-cart-btn:disabled {
+      border-color: #D1D5DB; color: #9CA3AF;
+      cursor: not-allowed; background: #F9FAFB;
+    }
+    .cart-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 90;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-top: 1px solid var(--color-border);
+      padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+      display: none;
+    }
+    .cart-bar.show { display: block; }
+    body.cart-open { padding-bottom: 88px; }
+    .cart-bar .inner {
+      max-width: 460px; margin: 0 auto;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .cart-bar .cart-info { flex: 1; font-size: 13px; font-weight: 700; color: var(--color-text); min-width: 0; }
+    .cart-bar .cart-info .cart-total { color: var(--color-price); font-weight: 800; }
+    .cart-bar .cart-clear-btn {
+      background: none; border: none; color: var(--color-text-sub);
+      font-size: 11.5px; cursor: pointer; font-family: inherit;
+      padding: 4px 6px; text-decoration: underline;
+    }
+    .cart-bar .cart-order-btn {
+      background: var(--color-primary); color: white; border: none;
+      border-radius: 10px; padding: 12px 20px;
+      font-size: 14.5px; font-weight: 800; cursor: pointer; font-family: inherit;
+      flex-shrink: 0;
+    }
+    .cart-bar .cart-order-btn:active { transform: scale(0.97); }
+    /* 폼 장바구니 목록 */
+    .cart-item-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    .cart-item-row .ci-thumb, .cart-item-row .ci-thumb-fb {
+      width: 44px; height: 44px; border-radius: 8px; flex-shrink: 0;
+    }
+    .cart-item-row .ci-thumb { object-fit: cover; background: #F3F4F6; }
+    .cart-item-row .ci-thumb-fb {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; background: linear-gradient(135deg, #FFE0E6, #FFC4CD);
+    }
+    .cart-item-row .ci-info { flex: 1; min-width: 0; }
+    .cart-item-row .ci-name {
+      font-size: 13px; font-weight: 700; line-height: 1.3;
+      display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .cart-item-row .ci-sub { font-size: 12px; color: var(--color-text-sub); font-weight: 600; }
+    .cart-item-row .ci-remove {
+      background: none; border: none; color: var(--color-text-sub);
+      font-size: 15px; cursor: pointer; font-family: inherit; padding: 6px; flex-shrink: 0;
+    }
+    .cart-summary-total {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 10px; margin-top: 4px;
+      border-top: 1.5px solid var(--color-border);
+      font-size: 14px; font-weight: 800;
+    }
+    .cart-summary-total .amt { color: var(--color-price); font-size: 17px; }
+    /* 담김 미니 토스트 */
+    .mini-toast {
+      position: fixed;
+      bottom: 92px; left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      opacity: 0;
+      background: var(--color-text); color: white;
+      padding: 9px 16px; border-radius: 999px;
+      font-size: 13px; font-weight: 600;
+      z-index: 95; transition: all 0.25s;
+      pointer-events: none; white-space: nowrap;
+      max-width: 90vw; overflow: hidden; text-overflow: ellipsis;
+    }
+    .mini-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     /* 결제 안내 카드 — 상세 페이지 구매 버튼 위 */
     .payment-method-info {
       display: flex;
@@ -494,9 +597,7 @@
 
     /* ─────────── 폼 view 상품 요약 ─────────── */
     .form-product-summary {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      display: block;
       background: linear-gradient(135deg, #FFFFFF, #FAFAF5);
       border: 1.5px solid var(--color-primary-light);
       border-radius: 12px;
@@ -1699,10 +1800,13 @@
         <span>주문 후 안내된 계좌로 입금하시면 순차 발송됩니다</span>
       </div>
     </div>
-    <button class="cta-buy-btn" id="ctaBuyBtn" onclick="goToForm()">
-      <span>구매하기 (무통장입금)</span>
-      <span class="cta-sub">주문 후 계좌로 입금 → 발송</span>
-    </button>
+    <div class="cta-row">
+      <button class="cta-cart-btn" id="ctaCartBtn" onclick="addToCartClick()">🛒<br>담기</button>
+      <button class="cta-buy-btn" id="ctaBuyBtn" onclick="goToForm()">
+        <span>구매하기 (무통장입금)</span>
+        <span class="cta-sub">주문 후 계좌로 입금 → 발송</span>
+      </button>
+    </div>
   </div>
 
   <!-- ═════════ VIEW: FORM (주문 정보 입력) ═════════ -->
@@ -1811,6 +1915,18 @@
     </button>
   </div>
 
+  <!-- 장바구니 바 (마켓·상세에서 담긴 상품이 있을 때 하단 고정) -->
+  <div class="cart-bar" id="cartBar">
+    <div class="inner">
+      <div class="cart-info">
+        🛒 <span id="cartCount"></span> · <span class="cart-total" id="cartTotalTxt"></span>
+        <button class="cart-clear-btn" onclick="clearCart()">비우기</button>
+      </div>
+      <button class="cart-order-btn" onclick="goToCartForm()">주문하기</button>
+    </div>
+  </div>
+  <div class="mini-toast" id="miniToast"></div>
+
   <!-- Daum Postcode Layer -->
   <div class="postcode-overlay" id="postcodeOverlay" onclick="if(event.target===this) closePostcode()">
     <div class="postcode-layer">
@@ -1850,6 +1966,12 @@
       </div>
       <div class="payment-notice">
         ⏰ 입금 확인 후 순차적으로 발송됩니다
+      </div>
+      <div style="margin-top:10px; font-size:12px; color:var(--color-text-sub); font-weight:600; line-height:1.6;">
+        ✏️ 주문 취소·변경은 인스타그램 DM
+        <a href="https://www.instagram.com/baefluencer/" target="_blank" rel="noopener"
+           style="color:var(--color-primary-dark); font-weight:800;">@baefluencer</a>로
+        <strong>주문번호와 함께</strong> 보내주세요
       </div>
     </div>
     <a class="order-status-link" id="orderStatusLink" href="#lookupSection" onclick="openLookupFromSuccess(event)">
@@ -1955,6 +2077,7 @@ let SHOP = {
 };
 let selectedProduct = null;
 let quantity = 1;
+let cart = [];  // 장바구니: [{ name, qty }] — 여러 상품을 한 번에 주문
 
 /* ============================================
    초기화 - 서버에서 설정 로드 후 렌더링
@@ -1999,13 +2122,19 @@ function setupHistoryRouting() {
     backNavPending = false;  // 뒤로가기 완료 — 다음 뒤로가기 허용
     const state = e.state;
     if (state && state.view) {
-      if ((state.view === 'detail' || state.view === 'form') && state.productIdx != null) {
+      if (state.view === 'detail' && state.productIdx != null) {
         const p = SHOP.products[state.productIdx];
         if (p) {
           selectedProduct = state.productIdx;
-          if (state.view === 'detail') renderDetail(p);
-          if (state.view === 'form') { renderDetail(p); renderFormSummary(p); }
+          renderDetail(p);
         }
+      }
+      if (state.view === 'form') {
+        // 장바구니가 비었으면(주문 완료 직후 등) 폼 대신 마켓으로.
+        // 히스토리 엔트리도 market으로 교체 — 낡은 form 엔트리가 남아
+        // 나중에 장바구니가 다시 채워졌을 때 옛 주문서가 튀어나오는 것 방지
+        if (cart.length === 0) { switchViewReplace('market'); return; }
+        renderCartSummary();
       }
       showViewInternal(state.view);
     } else {
@@ -2035,6 +2164,7 @@ function showViewInternal(viewName) {
   if (viewName !== 'success' && success) success.classList.remove('show');
   if (viewName === 'success' && success) success.classList.add('show');
   currentView = viewName;
+  updateCartBar();  // 장바구니 바는 마켓·상세에서만 표시
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -2059,7 +2189,7 @@ function safeHistoryBack(expectedView) {
 function goBackToMarket() {
   safeHistoryBack('detail');
 }
-/* 상세 → 폼 */
+/* 상세 → 폼 (바로 구매: 현재 상품·수량을 장바구니에 합치고 주문서로) */
 function goToForm() {
   if (selectedProduct === null) return;
   const p = SHOP.products[selectedProduct];
@@ -2069,8 +2199,22 @@ function goToForm() {
     alert('죄송합니다. 해당 상품은 품절되었습니다.');
     return;
   }
-  renderFormSummary(p);
+  // 바로구매는 "설정" 모드 — 뒤로가기로 상세에 돌아왔다 다시 눌러도 수량이 불어나지 않음
+  if (!addToCart(false, true)) return;
+  renderCartSummary();
   showView('form');
+}
+
+/* 장바구니 바 → 폼 */
+function goToCartForm() {
+  if (cart.length === 0) return;
+  renderCartSummary();
+  showView('form');
+}
+
+/* 상세 화면 "담기" 버튼 — 누적 모드 */
+function addToCartClick() {
+  addToCart(true, false);
 }
 /* 폼 → 상세 (pushState를 또 쌓지 않고 브라우저 히스토리를 되돌림) */
 function goBackToDetail() {
@@ -2190,12 +2334,14 @@ function renderDetail(p) {
     desc.style.display = 'none';
   }
 
-  // 구매 버튼
+  // 구매·담기 버튼
   const buyBtn = document.getElementById('ctaBuyBtn');
   buyBtn.disabled = isOut;
   buyBtn.innerHTML = isOut
     ? '<span>품절</span>'
     : '<span>구매하기 (무통장입금)</span><span class="cta-sub">주문 후 계좌로 입금 → 발송</span>';
+  const cartBtn = document.getElementById('ctaCartBtn');
+  if (cartBtn) cartBtn.disabled = isOut;
 
   // 수량이 재고보다 많으면 조정
   if (stock !== null && quantity > Math.max(1, stock)) {
@@ -2206,23 +2352,35 @@ function renderDetail(p) {
   updateTotal();
 }
 
-/* 폼 view 의 상품 요약 카드 렌더링 */
-function renderFormSummary(p) {
-  const summary = document.getElementById('formProductSummary');
-  if (!summary || !p) return;
-  const imageHtml = p.imageUrl
-    ? `<img class="thumb" src="${escapeAttr(p.imageUrl)}" alt=""
-            onerror="this.style.display='none'; var f=this.parentNode.querySelector('.thumb-fallback'); if(f) f.style.display='flex';">
-       <div class="thumb-fallback" style="display:none">${guessEmoji(p.name)}</div>`
-    : `<div class="thumb-fallback">${guessEmoji(p.name)}</div>`;
-  const total = p.price * quantity;
-  summary.innerHTML = `
-    ${imageHtml}
-    <div class="info">
-      <div class="name">${escapeHtml(p.name)}</div>
-      <div class="qty-price">수량 ${quantity}개 · <strong>${total.toLocaleString()}원</strong></div>
-    </div>
-  `;
+/* 폼 view 의 장바구니 목록 렌더링 */
+function renderCartSummary() {
+  const box = document.getElementById('formProductSummary');
+  if (!box) return;
+  let html = '';
+  cart.forEach((it, idx) => {
+    const p = findProductByName(it.name);
+    if (!p) return;
+    const thumb = p.imageUrl
+      ? `<img class="ci-thumb" src="${escapeAttr(p.imageUrl)}" alt=""
+              onerror="this.style.display='none'; var f=this.parentNode.querySelector('.ci-thumb-fb'); if(f) f.style.display='flex';">
+         <div class="ci-thumb-fb" style="display:none">${guessEmoji(p.name)}</div>`
+      : `<div class="ci-thumb-fb">${guessEmoji(p.name)}</div>`;
+    html += `
+      <div class="cart-item-row">
+        ${thumb}
+        <div class="ci-info">
+          <div class="ci-name">${escapeHtml(p.name)}</div>
+          <div class="ci-sub">${it.qty}개 · ${(p.price * it.qty).toLocaleString()}원</div>
+        </div>
+        <button class="ci-remove" onclick="removeFromCart(${idx})" aria-label="상품 빼기">✕</button>
+      </div>`;
+  });
+  html += `
+    <div class="cart-summary-total">
+      <span>총 결제금액</span>
+      <span class="amt">${cartTotal().toLocaleString()}원</span>
+    </div>`;
+  box.innerHTML = html;
 }
 
 /* 서버 설정 로드. 성공 시 true, 실패 시 false (호출부에서 에러 화면 처리)
@@ -2260,6 +2418,7 @@ function renderShop() {
     `${SHOP.bank.name} ${SHOP.bank.account}`;
   // 마켓 그리드 렌더 (라디오 방식은 마켓 카드로 대체됨)
   renderMarketGrid();
+  updateCartBar();
 }
 
 /* 상품의 재고 값 정규화: null = 무제한, 숫자 = 그 수량 */
@@ -2268,6 +2427,91 @@ function getStock(p) {
   if (p.stock === null || p.stock === undefined || p.stock === '') return null;
   const n = Number(p.stock);
   return isNaN(n) ? null : n;
+}
+
+/* ============================================
+   장바구니
+   ============================================ */
+function findProductByName(name) {
+  return SHOP.products.find(p => p.name === name) || null;
+}
+
+function cartTotal() {
+  return cart.reduce((sum, it) => {
+    const p = findProductByName(it.name);
+    return sum + (p ? p.price * it.qty : 0);
+  }, 0);
+}
+
+/* 현재 상세의 상품+수량을 장바구니에 반영 (재고·최대수량 초과분은 자동 조정)
+   setMode=true: 수량을 현재 선택값으로 "설정" — 바로구매용 (뒤로가기 후 재구매해도 수량이 불어나지 않음)
+   setMode=false: 기존 수량에 "누적" — 담기 버튼용 */
+function addToCart(withToast, setMode) {
+  const p = SHOP.products[selectedProduct];
+  if (!p) return false;
+  const stock = getStock(p);
+  const existing = cart.find(it => it.name === p.name);
+  let newQty = setMode ? quantity : (existing ? existing.qty : 0) + quantity;
+  let capped = false;
+  if (newQty > SHOP.maxQty) { newQty = SHOP.maxQty; capped = true; }
+  if (stock !== null && newQty > stock) { newQty = Math.max(1, stock); capped = true; }
+  if (existing) existing.qty = newQty;
+  else cart.push({ name: p.name, qty: newQty });
+  updateCartBar();
+  if (capped) miniToast(`수량이 최대 가능 수량(${newQty}개)으로 조정됐어요`);
+  else if (withToast) miniToast('🛒 장바구니에 담았어요');
+  return true;
+}
+
+function removeFromCart(idx) {
+  cart.splice(idx, 1);
+  updateCartBar();
+  if (currentView === 'form') {
+    if (cart.length === 0) switchViewReplace('market');
+    else renderCartSummary();
+  }
+}
+
+function clearCart() {
+  cart = [];
+  updateCartBar();
+}
+
+function updateCartBar() {
+  const bar = document.getElementById('cartBar');
+  if (!bar) return;
+  const visible = cart.length > 0 && (currentView === 'market' || currentView === 'detail');
+  bar.classList.toggle('show', visible);
+  document.body.classList.toggle('cart-open', visible);
+  if (cart.length > 0) {
+    const totalQty = cart.reduce((s, it) => s + it.qty, 0);
+    const firstName = cart[0].name.length > 10 ? cart[0].name.slice(0, 10) + '…' : cart[0].name;
+    document.getElementById('cartCount').textContent =
+      cart.length === 1 ? `${firstName} ${cart[0].qty}개` : `상품 ${cart.length}종 ${totalQty}개`;
+    document.getElementById('cartTotalTxt').textContent = cartTotal().toLocaleString() + '원';
+  }
+  // 상세 화면 구매 버튼 부제: 장바구니에 "다른" 상품이 있으면 함께 주문됨을 표시
+  // (상세의 총 결제금액은 현재 상품 기준이라, 실제 주문 총액과 다를 수 있음을 알림)
+  if (currentView === 'detail' && selectedProduct !== null) {
+    const cur = SHOP.products[selectedProduct];
+    const sub = document.querySelector('#ctaBuyBtn .cta-sub');
+    if (sub && cur) {
+      const others = cart.filter(it => it.name !== cur.name);
+      sub.textContent = others.length > 0
+        ? `🛒 장바구니 상품 ${others.length}종과 함께 주문돼요`
+        : '주문 후 계좌로 입금 → 발송';
+    }
+  }
+}
+
+let miniToastTimer = null;
+function miniToast(msg) {
+  const el = document.getElementById('miniToast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(miniToastTimer);
+  miniToastTimer = setTimeout(() => el.classList.remove('show'), 1800);
 }
 
 /* HTML/속성 이스케이프 */
@@ -2606,14 +2850,26 @@ async function submitOrder() {
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
   btn.classList.add('loading');
-  
-  const product = SHOP.products[selectedProduct];
+
+  // 장바구니 → 주문 아이템 (판매 종료 상품이 섞여있으면 중단 후 새로고침)
+  const items = [];
+  let missing = false;
+  cart.forEach(it => {
+    const p = findProductByName(it.name);
+    if (!p) { missing = true; return; }
+    items.push({ product: p.name, quantity: it.qty, unitPrice: p.price });
+  });
+  if (missing || items.length === 0) {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    alert('⚠️ 일부 상품의 판매가 종료되었어요. 최신 정보로 새로고침합니다.');
+    await refreshShopAndResync();
+    return;
+  }
 
   const orderData = {
-    product: product.name,
-    unitPrice: product.price,
-    quantity: quantity,
-    totalPrice: product.price * quantity,
+    items: items,
+    totalPrice: cartTotal(),
     name: document.getElementById('name').value.trim(),
     phone: document.getElementById('phone').value.trim(),
     depositor: document.getElementById('depositor').value.trim(),
@@ -2624,6 +2880,12 @@ async function submitOrder() {
     memo: document.getElementById('memo').value.trim(),
     orderDate: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })
   };
+  // 구형 서버 호환: 단일 상품 주문이면 기존 필드도 같이 전송
+  if (items.length === 1) {
+    orderData.product = items[0].product;
+    orderData.unitPrice = items[0].unitPrice;
+    orderData.quantity = items[0].quantity;
+  }
 
   try {
     // text/plain 으로 보내야 CORS preflight 회피 (Apps Script는 doOptions 없음)
@@ -2649,7 +2911,8 @@ async function submitOrder() {
     }
 
     // ✅ 시트 저장 확인됨 → 서버가 만든 주문번호로 성공 화면
-    showSuccess(result.orderId, orderData.totalPrice);
+    // (중복 재시도 시 서버가 기존 주문의 금액을 돌려주므로 그 값을 우선 사용)
+    showSuccess(result.orderId, result.totalPrice != null ? result.totalPrice : orderData.totalPrice);
   } catch (error) {
     console.error('Submit error:', error);
     btn.disabled = false;
@@ -2671,7 +2934,7 @@ async function submitOrder() {
         '⚠️ ' + error.message + '\n\n' +
         '최신 정보로 새로고침합니다.'
       );
-      await refreshShopAndResync(product.name);
+      await refreshShopAndResync();
     } else {
       alert(
         '⚠️ 주문이 접수되지 않았습니다.\n\n' +
@@ -2689,30 +2952,50 @@ function switchViewReplace(viewName) {
   try { history.replaceState({ view: viewName, productIdx: selectedProduct }, '', '#' + viewName); } catch(e) {}
 }
 
-/* 재고/가격 변경 에러 후: 설정을 다시 불러오고 선택 상품을 '이름'으로 재동기화
-   (상품 순서가 바뀌어도 엉뚱한 상품이 주문되지 않도록) */
-async function refreshShopAndResync(productName) {
+/* 재고/가격 변경 에러 후: 설정을 다시 불러오고 장바구니·선택 상품을 재검증
+   (상품 순서가 바뀌어도 엉뚱한 상품이 주문되지 않도록 '이름' 기준으로 재동기화) */
+async function refreshShopAndResync() {
   try {
+    // 재로드 전에 현재 선택 상품의 이름을 보관 (인덱스는 재로드 후 달라질 수 있음)
+    const prevName = (selectedProduct !== null && SHOP.products[selectedProduct])
+      ? SHOP.products[selectedProduct].name : null;
+
     const ok = await loadConfig();
     if (!ok) return;
     renderShop();
-    const newIdx = SHOP.products.findIndex(p => p.name === productName);
-    if (newIdx === -1) {
-      // 상품이 내려감 — 마켓으로 복귀
-      selectedProduct = null;
-      switchViewReplace('market');
-      return;
+
+    // 장바구니 재검증: 내려간·품절 상품 제거, 수량은 재고·최대수량에 맞게 축소
+    const dropped = [];
+    cart = cart.filter(it => {
+      const p = findProductByName(it.name);
+      if (!p) { dropped.push(it.name); return false; }
+      const st = getStock(p);
+      if (st !== null && st <= 0) { dropped.push(it.name); return false; }
+      if (st !== null && it.qty > st) it.qty = st;
+      if (it.qty > SHOP.maxQty) it.qty = SHOP.maxQty;
+      return true;
+    });
+    updateCartBar();
+    if (dropped.length) miniToast(`품절로 제외됨: ${dropped.join(', ')}`);
+
+    // 선택 상품 인덱스 재동기화 (상세 화면용)
+    if (prevName) {
+      const idx = SHOP.products.findIndex(p => p.name === prevName);
+      selectedProduct = idx === -1 ? null : idx;
+      if (idx !== -1) {
+        const p = SHOP.products[idx];
+        const st = getStock(p);
+        if (st !== null && quantity > st) quantity = Math.max(1, st);
+        renderDetail(p);
+      }
     }
-    selectedProduct = newIdx;
-    const p = SHOP.products[newIdx];
-    const stock = getStock(p);
-    if (stock !== null && quantity > stock) quantity = Math.max(1, stock);
-    renderDetail(p);
-    if (stock !== null && stock <= 0) {
-      switchViewReplace('detail');  // 품절 — 상세로 되돌려 품절 표시
-    } else {
-      renderFormSummary(p);          // 폼 유지, 요약·금액 갱신
-      switchViewReplace('form');     // 히스토리 상태의 productIdx도 최신으로 교체
+
+    // 화면 정리 — 사용자 이동이 아니므로 히스토리는 교체(replace)만
+    if (currentView === 'form') {
+      if (cart.length === 0) switchViewReplace('market');
+      else { renderCartSummary(); switchViewReplace('form'); }
+    } else if (currentView === 'detail' && selectedProduct === null) {
+      switchViewReplace('market');
     }
   } catch (e) { /* ignore */ }
 }
@@ -2724,6 +3007,9 @@ function showSuccess(orderId, totalPrice) {
   submitBtn.classList.remove('loading');
   // 동의 체크 해제 — 뒤로가기로 폼에 돌아와 실수로 재제출하는 것 방지 (다시 체크해야 제출됨)
   document.getElementById('agree').checked = false;
+  // 장바구니 비움 — 뒤로가기로 폼에 돌아가면 빈 장바구니라 마켓으로 안내됨
+  cart = [];
+  updateCartBar();
 
   document.getElementById('orderId').textContent = orderId;
   document.getElementById('successBankDisplay').textContent =
