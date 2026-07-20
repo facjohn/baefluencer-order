@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>관리자 - 주문폼 설정</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
@@ -708,7 +708,7 @@
       <div class="alert-bar">
         <div class="alert-pill warn">
           <span class="num" id="statUnconfirmed">-</span>
-          입금 미확인
+          입금 미확인 (30일)
         </div>
         <div class="alert-pill info">
           <span class="num" id="statAwaiting">-</span>
@@ -718,7 +718,7 @@
 
       <div style="margin-top:18px;">
         <div style="font-size:12.5px; color:var(--color-text-sub); font-weight:600; margin-bottom:8px;">
-          📈 최근 7일 주문 추이
+          📈 최근 7일 매출 추이 <span style="font-weight:500;">(막대 높이 = 매출)</span>
         </div>
         <div class="daily-chart" id="dailyChart"></div>
       </div>
@@ -806,7 +806,10 @@ let isDirty = false;
 /* ============================================
    로그인
    ============================================ */
+let loginInFlight = false;
+
 async function login() {
+  if (loginInFlight) return;  // 자동 로그인과 수동 로그인이 겹쳐 이중 초기화되는 것 방지
   const pw = document.getElementById('pwInput').value.trim();
   const errorEl = document.getElementById('loginError');
   errorEl.textContent = '';
@@ -820,15 +823,20 @@ async function login() {
     return;
   }
 
+  loginInFlight = true;
   try {
     const r = await fetch(`${CONFIG.scriptUrl}?action=getAdminConfig&pw=${encodeURIComponent(pw)}`);
     if (!r.ok) throw new Error('서버 오류 ' + r.status);
     const data = await r.json();
 
     if (data.error) {
-      errorEl.textContent = data.error === 'Unauthorized'
-        ? '비밀번호가 틀렸습니다'
-        : '오류: ' + data.error;
+      // 비번 오답일 때만 저장된 비번 삭제 — 잠금/일시 오류에 올바른 비번이 지워지지 않게
+      if (data.error === 'Unauthorized') {
+        localStorage.removeItem('admin_pw');
+        errorEl.textContent = '비밀번호가 틀렸습니다';
+      } else {
+        errorEl.textContent = '오류: ' + data.error;
+      }
       return;
     }
 
@@ -838,6 +846,8 @@ async function login() {
     showMain(data);
   } catch (err) {
     errorEl.textContent = '연결 오류: ' + err.message;
+  } finally {
+    loginInFlight = false;
   }
 }
 
@@ -847,6 +857,8 @@ function logout() {
   }
   localStorage.removeItem('admin_pw');
   password = '';
+  isDirty = false;  // 이탈 경고·저장 바 상태 초기화
+  document.getElementById('bottomBar').classList.remove('show');
   document.getElementById('mainScreen').classList.remove('show');
   document.getElementById('loginScreen').classList.remove('hidden');
   document.getElementById('pwInput').value = '';
@@ -856,10 +868,13 @@ function logout() {
    메인 화면 표시
    ============================================ */
 function showMain(data) {
+  // origStock: 로드 시점의 재고 스냅샷 — 저장 시 서버가 "관리자가 재고를 직접 바꿨는지" 판별해서,
+  // 안 바꿨으면 시트의 최신 재고(주문으로 자동 차감된 값)를 보존한다 (덮어쓰기 사고 방지)
+  const products = data.products.map(p => ({ ...p, origStock: p.stock }));
   originalSettings = { ...data.settings };
-  originalProducts = JSON.parse(JSON.stringify(data.products));
+  originalProducts = JSON.parse(JSON.stringify(products));
   currentSettings = { ...data.settings };
-  currentProducts = JSON.parse(JSON.stringify(data.products));
+  currentProducts = JSON.parse(JSON.stringify(products));
 
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('mainScreen').classList.add('show');
@@ -914,7 +929,8 @@ function renderStats(stats) {
   const chart = document.getElementById('dailyChart');
   chart.innerHTML = '';
   const maxRevenue = Math.max(...stats.daily.map(d => d.revenue), 1);
-  const todayKey = new Date().toISOString().slice(0, 10);
+  // KST 기준 오늘 (toISOString은 UTC라 한국시간 00~09시에 어제로 표시되는 버그 있음)
+  const todayKey = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul' }).format(new Date());
   stats.daily.forEach(d => {
     const bar = document.createElement('div');
     const heightPct = (d.revenue / maxRevenue) * 100;
@@ -967,7 +983,10 @@ function renderSettings() {
     `;
     const input = div.querySelector('input');
     input.addEventListener('input', () => {
-      const v = field.type === 'number' ? Number(input.value) || 0 : input.value;
+      // number 필드를 비우면 0이 아니라 빈값으로 유지 (0이 기록되는 표시·상태 불일치 방지)
+      const v = field.type === 'number'
+        ? (input.value === '' ? '' : Number(input.value) || 0)
+        : input.value;
       currentSettings[field.key] = v;
       input.classList.toggle('changed', String(v) !== String(originalSettings[field.key] || ''));
       updateDirty();
@@ -998,9 +1017,9 @@ function renderProducts() {
     row.className = 'product-row';
     row.innerHTML = `
       <div class="product-row-main">
-        <input type="text" data-field="name" placeholder="상품명" value="${escapeAttr(product.name)}">
-        <input type="number" data-field="price" placeholder="0" value="${product.price || 0}">
-        <input type="number" data-field="stock" placeholder="∞" value="${stockNum === null ? '' : stockNum}"
+        <input type="text" data-field="name" placeholder="상품명" maxlength="100" value="${escapeAttr(product.name)}">
+        <input type="number" data-field="price" placeholder="0" min="0" value="${product.price || 0}">
+        <input type="number" data-field="stock" placeholder="∞" min="0" value="${stockNum === null ? '' : stockNum}"
                class="${isLowStock ? 'low-stock' : ''}">
         <div class="toggle">
           <input type="checkbox" data-field="active" ${product.active !== false ? 'checked' : ''}>
@@ -1019,7 +1038,7 @@ function renderProducts() {
       </div>
       <div class="product-row-extra">
         <span class="extra-label">🖼 이미지</span>
-        <input type="url" data-field="imageUrl" placeholder="https://... 인스타 이미지 URL (선택)"
+        <input type="url" data-field="imageUrl" placeholder="https://... 인스타 이미지 URL (선택)" maxlength="2000"
                value="${escapeAttr(product.imageUrl || '')}">
         ${product.imageUrl
           ? `<img class="image-preview" src="${escapeAttr(product.imageUrl)}" alt="" onerror="this.style.display='none'">`
@@ -1116,6 +1135,8 @@ function markChanged(input, idx, field) {
 }
 
 function addProduct() {
+  // ⚠️ origStock을 넣지 않음 — 신규 상품에 origStock:null이 있으면, 같은 이름으로
+  // 재등록했을 때 서버가 "재고 안 바꿈"으로 판단해 시트의 옛 재고(품절 0 등)를 상속해버림
   currentProducts.push({
     name: '', price: 0, active: true, stock: null,
     imageUrl: '', brand: '', description: ''
@@ -1168,6 +1189,20 @@ async function saveAll() {
     return;
   }
 
+  // 중복 상품명 검증 — 재고 차감·보존이 '상품명' 기준이라 중복이면 오동작함
+  const names = currentProducts.map(p => String(p.name || '').trim());
+  const dupName = names.find((n, i) => n && names.indexOf(n) !== i);
+  if (dupName) {
+    showToast(`상품명이 중복됩니다: "${dupName}"`, 'error');
+    return;
+  }
+
+  // 판매중인데 가격이 0원인 상품 경고 (실수 방지)
+  const zeroPriced = currentProducts.find(p => p.active !== false && !(Number(p.price) > 0));
+  if (zeroPriced && !confirm(`"${zeroPriced.name}" 상품의 가격이 0원입니다. 그대로 저장할까요?`)) {
+    return;
+  }
+
   const btn = document.getElementById('saveBtn');
   btn.disabled = true;
   btn.classList.add('loading');
@@ -1188,9 +1223,35 @@ async function saveAll() {
     const result = await response.json();
     if (!result.success) throw new Error(result.error || '저장 실패');
 
-    // 성공 → 원본 갱신, dirty 해제
-    originalSettings = { ...currentSettings };
-    originalProducts = JSON.parse(JSON.stringify(currentProducts));
+    // 성공 → 서버가 실제 기록한 값(재고 보존 로직 반영)을 다시 불러와 화면과 시트를 일치시킴
+    try {
+      const r2 = await fetch(`${CONFIG.scriptUrl}?action=getAdminConfig&pw=${encodeURIComponent(password)}`);
+      const fresh = await r2.json();
+      if (fresh.error) throw new Error(fresh.error);
+      const products = fresh.products.map(p => ({ ...p, origStock: p.stock }));
+      originalSettings = { ...fresh.settings };
+      originalProducts = JSON.parse(JSON.stringify(products));
+      currentSettings = { ...fresh.settings };
+      currentProducts = JSON.parse(JSON.stringify(products));
+      renderSettings();
+      renderProducts();
+    } catch (e2) {
+      // 재조회 실패 — 서버와 같은 정규화(이름 trim, 재고 0 미만 방지)를 로컬에도 적용 후 동기화
+      currentProducts.forEach(p => {
+        p.name = String(p.name || '').trim();
+        if (p.stock !== null && p.stock !== undefined && p.stock !== '') {
+          p.stock = Math.max(0, Number(p.stock) || 0);
+        }
+        p.origStock = p.stock;
+      });
+      originalSettings = { ...currentSettings };
+      originalProducts = JSON.parse(JSON.stringify(currentProducts));
+      showToast('⚠️ 저장은 됐지만 화면 동기화에 실패했어요 — 새로고침 권장', 'error');
+      isDirty = false;
+      document.getElementById('bottomBar').classList.remove('show');
+      document.querySelectorAll('.changed').forEach(el => el.classList.remove('changed'));
+      return;
+    }
     isDirty = false;
     document.getElementById('bottomBar').classList.remove('show');
 
@@ -1210,7 +1271,10 @@ async function saveAll() {
    유틸
    ============================================ */
 function escapeAttr(str) {
-  return String(str || '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  // 0도 표시돼야 하므로 falsy 체크 대신 null 체크. &를 먼저 이스케이프해야 이중 인코딩 안 됨
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 function showToast(msg, type) {
