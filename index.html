@@ -17,6 +17,9 @@
   <meta property="og:locale" content="ko_KR">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+  <!-- 완판 도장 날짜용 필기체 -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
   <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
   <style>
     /* ============================================
@@ -266,6 +269,32 @@
       font-weight: 800;
       letter-spacing: 4px;
       text-indent: 4px;
+    }
+    /* 완판 날짜 — 빨간 네모 도장 느낌: 필기체 + 테두리 + 살짝 기울임 (완판 이력 마케팅)
+       사진 위에서도 묻히지 않게 도장 안쪽에 어두운 판 + 블러(간유리) 처리 */
+    .sold-out-overlay .date {
+      font-family: 'Nanum Pen Script', 'Segoe Script', cursive;
+      color: #FF5252;
+      font-size: 28px;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: 1px;
+      border: 2.5px solid #FF5252;
+      border-radius: 9px 4px 11px 5px;   /* 손으로 찍은 도장처럼 살짝 불규칙한 모서리 */
+      padding: 6px 14px 4px;
+      transform: rotate(-7deg);
+      margin-bottom: 8px;
+      background: rgba(15, 20, 32, 0.6);
+      -webkit-backdrop-filter: blur(3px);
+      backdrop-filter: blur(3px);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+      box-shadow: inset 0 0 6px rgba(255,82,82,0.25), 0 2px 12px rgba(0,0,0,0.45);
+    }
+    .detail-image .sold-out-overlay .date {
+      font-size: 42px;
+      border-width: 3.5px;
+      padding: 8px 20px 5px;
+      margin-bottom: 12px;
     }
     .detail-image .sold-out-overlay .txt { font-size: 44px; letter-spacing: 12px; text-indent: 12px; }
     .detail-image .sold-out-overlay .sub { font-size: 13px; letter-spacing: 6px; text-indent: 6px; }
@@ -2301,7 +2330,7 @@ function renderMarketGrid() {
       ? `<span class="card-badge low-stock-badge">${stock}개 남음</span>`
       : '';
     const overlayHtml = isOut
-      ? '<div class="sold-out-overlay"><span class="txt">완판</span><span class="sub">SOLD OUT</span></div>'
+      ? `<div class="sold-out-overlay">${p.soldOutDate ? `<span class="date">${escapeHtml(p.soldOutDate)}</span>` : ''}<span class="txt">완판</span><span class="sub">SOLD OUT</span></div>`
       : '';
 
     const imageHtml = p.imageUrl
@@ -2348,7 +2377,7 @@ function renderDetail(p) {
   } else {
     inner = `<div class="fallback-emoji">${guessEmoji(p.name)}</div>`;
   }
-  if (isOut) inner += '<div class="sold-out-overlay"><span class="txt">완판</span><span class="sub">SOLD OUT</span></div>';
+  if (isOut) inner += `<div class="sold-out-overlay">${p.soldOutDate ? `<span class="date">${escapeHtml(p.soldOutDate)}</span>` : ''}<span class="txt">완판</span><span class="sub">SOLD OUT</span></div>`;
   else if (isLow) inner += `<span class="detail-badge low-stock-badge">${stock}개 남음</span>`;
   detailImage.innerHTML = inner;
 

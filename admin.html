@@ -807,7 +807,8 @@
         💡 <strong>재고</strong>: 비우면 무제한, 숫자 입력 시 주문마다 자동 차감 (20개 이하면 폼에서 "N개 남음" 빨강 펄스 배지 표시)<br>
         💡 <strong>브랜드</strong>: 카드 상단에 작게 표시 (예: "배플루언서 농가직송")<br>
         💡 <strong>설명</strong>: 상품 상세 페이지에 표시되는 한 줄 (예: "당도 14브릭스 이상")<br>
-        💡 <strong>이미지</strong>: 📷 버튼으로 사진을 바로 올리면 끝 (자동 압축·저장). 외부 URL 붙여넣기도 가능 (모두 선택, 비어도 정상)
+        💡 <strong>이미지</strong>: 📷 버튼으로 사진을 바로 올리면 끝 (자동 압축·저장). 외부 URL 붙여넣기도 가능 (모두 선택, 비어도 정상)<br>
+        💡 <strong>완판일</strong>: 재고가 0(완판)이 되면 손님 카드에 "2026년 2월 + 완판 SOLD OUT"으로 표시 — 완판 이력 마케팅용
       </div>
     </div>
   </div>
@@ -1096,6 +1097,11 @@ function renderProducts() {
                value="${escapeAttr(product.description || '')}">
       </div>
       <div class="product-row-extra">
+        <span class="extra-label">🗓 완판일</span>
+        <input type="text" data-field="soldOutDate" placeholder="예: 2026년 2월 — 완판(재고 0) 시 카드에 표시 (선택)" maxlength="50"
+               value="${escapeAttr(product.soldOutDate || '')}">
+      </div>
+      <div class="product-row-extra">
         <span class="extra-label">🖼 이미지</span>
         <button type="button" class="upload-btn" title="사진 파일을 선택하면 자동 압축·업로드됩니다">📷 올리기</button>
         <input type="url" data-field="imageUrl" placeholder="📷로 업로드 또는 URL 붙여넣기 (선택)" maxlength="2000"
@@ -1113,6 +1119,7 @@ function renderProducts() {
     const imageInput = row.querySelector('[data-field="imageUrl"]');
     const brandInput = row.querySelector('[data-field="brand"]');
     const descInput = row.querySelector('[data-field="description"]');
+    const soldOutDateInput = row.querySelector('[data-field="soldOutDate"]');
     const deleteBtn = row.querySelector('.delete-btn');
 
     nameInput.addEventListener('input', () => {
@@ -1152,6 +1159,11 @@ function renderProducts() {
     descInput.addEventListener('input', () => {
       currentProducts[i].description = descInput.value;
       markChanged(descInput, i, 'description');
+      updateDirty();
+    });
+    soldOutDateInput.addEventListener('input', () => {
+      currentProducts[i].soldOutDate = soldOutDateInput.value;
+      markChanged(soldOutDateInput, i, 'soldOutDate');
       updateDirty();
     });
     deleteBtn.addEventListener('click', () => {
@@ -1251,7 +1263,7 @@ function addProduct() {
   // 새 상품은 맨 위(= 손님 화면 맨 앞, 신상 자리)로 추가
   currentProducts.unshift({
     name: '', price: 0, active: true, stock: null,
-    imageUrl: '', brand: '', description: ''
+    imageUrl: '', brand: '', description: '', soldOutDate: ''
   });
   renderProducts();
   updateDirty();
