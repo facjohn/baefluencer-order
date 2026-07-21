@@ -230,13 +230,45 @@
       margin-bottom: 12px;
     }
     .product-card {
+      position: relative;
       cursor: pointer;
       border-radius: 12px;
       transition: transform 0.15s;
       -webkit-tap-highlight-color: transparent;
     }
     .product-card:active { transform: scale(0.97); }
-    .product-card.sold-out { opacity: 0.55; cursor: not-allowed; }
+    .product-card.sold-out { cursor: not-allowed; }
+    .product-card.sold-out:active { transform: none; }
+    /* 완판 오버레이 — 이름·가격까지 카드 전체를 덮는 큰 도장. 완판도 마케팅! */
+    .sold-out-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      background: rgba(17, 24, 39, 0.55);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+    }
+    .sold-out-overlay .txt {
+      color: #fff;
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: 8px;
+      text-indent: 8px;   /* letter-spacing 좌우 보정 */
+      text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    }
+    .sold-out-overlay .sub {
+      color: rgba(255,255,255,0.85);
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 4px;
+      text-indent: 4px;
+    }
+    .detail-image .sold-out-overlay .txt { font-size: 44px; letter-spacing: 12px; text-indent: 12px; }
+    .detail-image .sold-out-overlay .sub { font-size: 13px; letter-spacing: 6px; text-indent: 6px; }
     .product-card-image {
       position: relative;
       aspect-ratio: 1 / 1;
@@ -308,7 +340,6 @@
       color: var(--color-price);
       letter-spacing: -0.3px;
     }
-    .product-card.sold-out .name { text-decoration: line-through; }
     .product-card.sold-out .price { color: var(--color-text-sub); }
 
     /* ─────────── 상세 페이지 ─────────── */
@@ -2261,12 +2292,13 @@ function renderMarketGrid() {
     const card = document.createElement('div');
     card.className = 'product-card' + (isOut ? ' sold-out' : '');
 
-    let badgeHtml = '';
-    if (isOut) {
-      badgeHtml = '<span class="card-badge sold-out-badge">품절</span>';
-    } else if (isLow) {
-      badgeHtml = `<span class="card-badge low-stock-badge">${stock}개 남음</span>`;
-    }
+    // 재고 부족 배지는 이미지 위, 완판 오버레이는 카드 전체(이름·가격 포함) 위
+    const badgeHtml = (!isOut && isLow)
+      ? `<span class="card-badge low-stock-badge">${stock}개 남음</span>`
+      : '';
+    const overlayHtml = isOut
+      ? '<div class="sold-out-overlay"><span class="txt">완판</span><span class="sub">SOLD OUT</span></div>'
+      : '';
 
     const imageHtml = p.imageUrl
       ? `<img src="${escapeAttr(p.imageUrl)}" alt="${escapeAttr(p.name)}" loading="lazy"
@@ -2284,6 +2316,7 @@ function renderMarketGrid() {
         <div class="name">${escapeHtml(p.name)}</div>
         <div class="price">${p.price.toLocaleString()}원</div>
       </div>
+      ${overlayHtml}
     `;
     if (!isOut) {
       card.addEventListener('click', () => goToDetail(i));
@@ -2311,7 +2344,7 @@ function renderDetail(p) {
   } else {
     inner = `<div class="fallback-emoji">${guessEmoji(p.name)}</div>`;
   }
-  if (isOut) inner += '<span class="detail-badge sold-out-badge">품절</span>';
+  if (isOut) inner += '<div class="sold-out-overlay"><span class="txt">완판</span><span class="sub">SOLD OUT</span></div>';
   else if (isLow) inner += `<span class="detail-badge low-stock-badge">${stock}개 남음</span>`;
   detailImage.innerHTML = inner;
 
@@ -2338,7 +2371,7 @@ function renderDetail(p) {
   const buyBtn = document.getElementById('ctaBuyBtn');
   buyBtn.disabled = isOut;
   buyBtn.innerHTML = isOut
-    ? '<span>품절</span>'
+    ? '<span>완판되었습니다</span>'
     : '<span>구매하기 (무통장입금)</span><span class="cta-sub">주문 후 계좌로 입금 → 발송</span>';
   const cartBtn = document.getElementById('ctaCartBtn');
   if (cartBtn) cartBtn.disabled = isOut;
