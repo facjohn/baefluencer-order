@@ -484,6 +484,33 @@
       flex-shrink: 0;
       border: 1px solid var(--color-border);
     }
+    .product-row-extra .upload-btn {
+      flex: none;
+      height: 30px;
+      padding: 0 10px !important;
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      border: 1px solid var(--color-primary);
+      border-radius: 8px;
+      font-size: 12px !important;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .product-row-extra .upload-btn:active {
+      transform: scale(0.95);
+    }
+    .product-row-extra .upload-btn.uploading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    /* 데스크톱: 이미지 파일을 상품 행 위로 드래그하면 강조 */
+    .product-row.drag-over {
+      outline: 2px dashed var(--color-primary);
+      outline-offset: 2px;
+      border-radius: 10px;
+    }
     .product-header {
       display: grid;
       grid-template-columns: 1fr 80px 64px 40px 32px;
@@ -754,7 +781,7 @@
         💡 <strong>재고</strong>: 비우면 무제한, 숫자 입력 시 주문마다 자동 차감 (20개 이하면 폼에서 "N개 남음" 빨강 펄스 배지 표시)<br>
         💡 <strong>브랜드</strong>: 카드 상단에 작게 표시 (예: "배플루언서 농가직송")<br>
         💡 <strong>설명</strong>: 상품 상세 페이지에 표시되는 한 줄 (예: "당도 14브릭스 이상")<br>
-        💡 <strong>이미지</strong>: 인스타 게시물 등 외부 URL 붙여넣기 (모두 선택, 비어도 정상)
+        💡 <strong>이미지</strong>: 📷 버튼으로 사진을 바로 올리면 끝 (자동 압축·저장). 외부 URL 붙여넣기도 가능 (모두 선택, 비어도 정상)
       </div>
     </div>
   </div>
@@ -1039,7 +1066,8 @@ function renderProducts() {
       </div>
       <div class="product-row-extra">
         <span class="extra-label">🖼 이미지</span>
-        <input type="url" data-field="imageUrl" placeholder="https://... 인스타 이미지 URL (선택)" maxlength="2000"
+        <button type="button" class="upload-btn" title="사진 파일을 선택하면 자동 압축·업로드됩니다">📷 올리기</button>
+        <input type="url" data-field="imageUrl" placeholder="📷로 업로드 또는 URL 붙여넣기 (선택)" maxlength="2000"
                value="${escapeAttr(product.imageUrl || '')}">
         ${product.imageUrl
           ? `<img class="image-preview" src="${escapeAttr(product.imageUrl)}" alt="" onerror="this.style.display='none'">`
@@ -1102,6 +1130,42 @@ function renderProducts() {
       updateDirty();
     });
 
+    // 📷 사진 업로드 — 클릭으로 파일 선택 (모바일은 카메라/갤러리)
+    const uploadBtn = row.querySelector('.upload-btn');
+    uploadBtn.addEventListener('click', () => {
+      // 파일 다이얼로그가 열린 뒤 거부되면 혼란스러우니 열기 전에 차단
+      if (imageUploading) {
+        showToast('이미 업로드가 진행 중이에요. 잠시만요!', 'error');
+        return;
+      }
+      const picker = document.createElement('input');
+      picker.type = 'file';
+      picker.accept = 'image/*';
+      picker.onchange = () => {
+        const file = picker.files && picker.files[0];
+        if (file) uploadImageFile(product, file, uploadBtn);
+      };
+      picker.click();
+    });
+    // 데스크톱: 이미지 파일을 상품 행에 드래그&드롭해도 업로드
+    row.addEventListener('dragover', e => {
+      if (e.dataTransfer && Array.from(e.dataTransfer.types).includes('Files')) {
+        e.preventDefault();
+        row.classList.add('drag-over');
+      }
+    });
+    row.addEventListener('dragleave', e => {
+      // 행 내부 자식 요소로 이동할 때는 강조 유지 (깜빡임 방지)
+      if (e.relatedTarget && row.contains(e.relatedTarget)) return;
+      row.classList.remove('drag-over');
+    });
+    row.addEventListener('drop', e => {
+      e.preventDefault();
+      row.classList.remove('drag-over');
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file) uploadImageFile(product, file, uploadBtn);
+    });
+
     container.appendChild(row);
   });
 
@@ -1151,6 +1215,124 @@ function addProduct() {
 }
 
 /* ============================================
+   상품 사진 업로드
+   파일 선택/드롭 → 브라우저에서 리사이즈·압축 → GAS 업로드(Drive 저장) → URL 자동 입력
+   ============================================ */
+const IMAGE_MAX_DIM = 1000;   // 리사이즈 최대 변 길이(px)
+const IMAGE_QUALITY = 0.82;   // JPEG 품질
+
+let imageUploading = false;   // 동시 업로드 방지 (인덱스 꼬임 방지)
+
+// 행을 빗나간 드롭이 페이지를 이미지 파일로 통째로 이동시키는 것 방지
+document.addEventListener('dragover', e => e.preventDefault());
+document.addEventListener('drop', e => e.preventDefault());
+
+async function uploadImageFile(product, file, btn) {
+  if (imageUploading) {
+    showToast('이미 업로드가 진행 중이에요. 잠시만요!', 'error');
+    return;
+  }
+  if (!file.type || !file.type.startsWith('image/')) {
+    showToast('이미지 파일만 올릴 수 있어요', 'error');
+    return;
+  }
+  if (file.size > 25 * 1024 * 1024) {
+    showToast('파일이 너무 큽니다 (25MB 이하)', 'error');
+    return;
+  }
+
+  imageUploading = true;
+  const origLabel = btn.textContent;
+  btn.textContent = '⏳ 올리는 중…';
+  btn.classList.add('uploading');
+
+  try {
+    const dataUrl = await compressImage(file);
+    const response = await fetch(CONFIG.scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'uploadImage',
+        pw: password,
+        imageData: dataUrl
+      })
+    });
+    if (!response.ok) throw new Error('서버 응답 ' + response.status);
+    const result = await response.json();
+    if (!result.success) throw new Error(result.error || '업로드 실패');
+
+    // 업로드하는 동안 목록이 바뀌었을 수 있으니 객체 → 이름 순으로 다시 찾음
+    let idx = currentProducts.indexOf(product);
+    if (idx === -1) idx = currentProducts.findIndex(p => p.name === product.name);
+    if (idx === -1) {
+      showToast('업로드는 됐지만 상품이 삭제되어 반영하지 못했어요', 'error');
+      return;
+    }
+    currentProducts[idx].imageUrl = result.url;
+
+    // 전체 재렌더 대신 해당 행만 갱신 — 다른 칸을 편집 중인 포커스/모바일 키보드 보존
+    const rowEl = document.querySelectorAll('#productsContainer .product-row')[idx];
+    if (rowEl) {
+      const urlInput = rowEl.querySelector('[data-field="imageUrl"]');
+      if (urlInput) {
+        urlInput.value = result.url;
+        markChanged(urlInput, idx, 'imageUrl');
+        let prev = rowEl.querySelector('.image-preview');
+        if (!prev) {
+          prev = document.createElement('img');
+          prev.className = 'image-preview';
+          prev.alt = '';
+          prev.onerror = () => { prev.style.display = 'none'; };
+          urlInput.parentNode.appendChild(prev);
+        }
+        prev.style.display = '';   // 이전 onerror로 숨겨졌을 수 있음
+        prev.src = result.url;
+      }
+    }
+    updateDirty();
+    showToast('✅ 사진 업로드 완료! "💾 모두 저장"을 눌러야 손님에게 반영돼요', 'success');
+  } catch (err) {
+    showToast('사진 업로드 실패: ' + err.message, 'error');
+  } finally {
+    imageUploading = false;
+    // 업로드 중 다른 조작으로 재렌더됐어도 안전 — 떨어져 나간 버튼이면 no-op
+    btn.textContent = origLabel;
+    btn.classList.remove('uploading');
+  }
+}
+
+/* 캔버스로 리사이즈 + JPEG 압축 → dataURL (원본 20MB 사진도 ~100KB대로 줄어듦) */
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('파일을 읽을 수 없어요'));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('사진 형식을 해석할 수 없어요 (jpg/png 권장)'));
+      img.onload = () => {
+        try {
+          const scale = Math.min(1, IMAGE_MAX_DIM / Math.max(img.width, img.height));
+          const w = Math.max(1, Math.round(img.width * scale));
+          const h = Math.max(1, Math.round(img.height * scale));
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#fff';   // PNG 투명 배경이 JPEG에서 검게 변하는 것 방지
+          ctx.fillRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', IMAGE_QUALITY));
+        } catch (e) {
+          reject(new Error('이미지 변환 실패'));
+        }
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ============================================
    주문폼 URL 복사
    ============================================ */
 function copyOrderFormUrl() {
@@ -1183,6 +1365,12 @@ function updateDirty() {
 }
 
 async function saveAll() {
+  // 사진 업로드와 경합하면 업로드된 URL이 재조회에 덮여 조용히 유실됨 — 끝난 뒤 저장
+  if (imageUploading) {
+    showToast('사진 업로드가 끝난 뒤 저장해주세요', 'error');
+    return;
+  }
+
   // 빈 상품명 검증
   const invalidProducts = currentProducts.filter(p => !String(p.name || '').trim());
   if (invalidProducts.length > 0) {
