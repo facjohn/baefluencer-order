@@ -402,9 +402,33 @@
     .product-row:last-child { border-bottom: none; }
     .product-row-main {
       display: grid;
-      grid-template-columns: 1fr 80px 64px 40px 32px;
+      grid-template-columns: 20px 1fr 80px 64px 40px 32px;
       gap: 6px;
       align-items: center;
+    }
+    /* 순서 이동 버튼 — 목록 순서가 곧 손님 화면 노출 순서 */
+    .product-row .move-col {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .product-row .move-btn {
+      width: 20px;
+      height: 19px;
+      padding: 0;
+      border: 1px solid var(--color-border);
+      background: white;
+      border-radius: 5px;
+      font-size: 9px;
+      line-height: 1;
+      color: var(--color-text-sub);
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .product-row .move-btn:disabled { opacity: 0.25; cursor: default; }
+    .product-row .move-btn:active:not(:disabled) {
+      background: var(--color-primary-light);
+      color: var(--color-primary);
     }
     .product-row input[type="text"],
     .product-row input[type="number"],
@@ -513,7 +537,7 @@
     }
     .product-header {
       display: grid;
-      grid-template-columns: 1fr 80px 64px 40px 32px;
+      grid-template-columns: 20px 1fr 80px 64px 40px 32px;
       gap: 6px;
       padding-bottom: 8px;
       border-bottom: 1.5px solid var(--color-primary-light);
@@ -521,8 +545,8 @@
       color: var(--color-text-sub);
       font-weight: 600;
     }
-    .product-header > div:nth-child(2),
-    .product-header > div:nth-child(3) {
+    .product-header > div:nth-child(3),
+    .product-header > div:nth-child(4) {
       text-align: right;
     }
     .product-header .col-toggle,
@@ -662,7 +686,7 @@
       .card { padding: 18px 16px; }
       .field { grid-template-columns: 90px 1fr; gap: 8px; }
       .product-row-main, .product-header {
-        grid-template-columns: 1fr 70px 56px 36px 28px;
+        grid-template-columns: 18px 1fr 66px 52px 34px 26px;
         gap: 4px;
       }
       .product-row input[type="text"],
@@ -769,6 +793,7 @@
       <div class="card-title"><span class="icon">📦</span> 상품 목록</div>
       <div class="low-stock-banner" id="lowStockBanner"></div>
       <div class="product-header">
+        <div></div>
         <div>상품명</div>
         <div>가격</div>
         <div>재고</div>
@@ -778,6 +803,7 @@
       <div id="productsContainer"></div>
       <button class="add-btn" onclick="addProduct()">＋ 상품 추가</button>
       <div style="margin-top:10px; font-size:11.5px; color:var(--color-text-sub); line-height:1.6;">
+        💡 <strong>순서</strong>: 목록 순서 = 손님 화면 순서 (맨 위가 맨 앞). ▲▼로 변경, 새 상품은 맨 위(신상 자리)로 추가됨<br>
         💡 <strong>재고</strong>: 비우면 무제한, 숫자 입력 시 주문마다 자동 차감 (20개 이하면 폼에서 "N개 남음" 빨강 펄스 배지 표시)<br>
         💡 <strong>브랜드</strong>: 카드 상단에 작게 표시 (예: "배플루언서 농가직송")<br>
         💡 <strong>설명</strong>: 상품 상세 페이지에 표시되는 한 줄 (예: "당도 14브릭스 이상")<br>
@@ -898,7 +924,8 @@ function logout() {
 function showMain(data) {
   // origStock: 로드 시점의 재고 스냅샷 — 저장 시 서버가 "관리자가 재고를 직접 바꿨는지" 판별해서,
   // 안 바꿨으면 시트의 최신 재고(주문으로 자동 차감된 값)를 보존한다 (덮어쓰기 사고 방지)
-  const products = data.products.map(p => ({ ...p, origStock: p.stock }));
+  // reverse(): 관리자 목록을 손님 화면과 같은 순서(최신 등록이 위)로 표시. 저장 시 다시 뒤집어 기록
+  const products = data.products.map(p => ({ ...p, origStock: p.stock })).reverse();
   originalSettings = { ...data.settings };
   originalProducts = JSON.parse(JSON.stringify(products));
   currentSettings = { ...data.settings };
@@ -1045,6 +1072,10 @@ function renderProducts() {
     row.className = 'product-row';
     row.innerHTML = `
       <div class="product-row-main">
+        <div class="move-col">
+          <button type="button" class="move-btn move-up" title="위로 (손님 화면에서 앞으로)" ${i === 0 ? 'disabled' : ''}>▲</button>
+          <button type="button" class="move-btn move-down" title="아래로 (손님 화면에서 뒤로)" ${i === currentProducts.length - 1 ? 'disabled' : ''}>▼</button>
+        </div>
         <input type="text" data-field="name" placeholder="상품명" maxlength="100" value="${escapeAttr(product.name)}">
         <input type="number" data-field="price" placeholder="0" min="0" value="${product.price || 0}">
         <input type="number" data-field="stock" placeholder="∞" min="0" value="${stockNum === null ? '' : stockNum}"
@@ -1130,6 +1161,10 @@ function renderProducts() {
       updateDirty();
     });
 
+    // ▲▼ 순서 이동 — 목록 순서가 곧 손님 화면 노출 순서 (맨 위 = 맨 앞)
+    row.querySelector('.move-up').addEventListener('click', () => moveProduct(i, -1));
+    row.querySelector('.move-down').addEventListener('click', () => moveProduct(i, 1));
+
     // 📷 사진 업로드 — 클릭으로 파일 선택 (모바일은 카메라/갤러리)
     const uploadBtn = row.querySelector('.upload-btn');
     uploadBtn.addEventListener('click', () => {
@@ -1199,18 +1234,29 @@ function markChanged(input, idx, field) {
   input.classList.toggle('changed', changed);
 }
 
+/* 상품 순서 이동 — 목록 순서 = 손님 화면 순서 (맨 위가 맨 앞) */
+function moveProduct(idx, delta) {
+  const j = idx + delta;
+  if (j < 0 || j >= currentProducts.length) return;
+  const tmp = currentProducts[idx];
+  currentProducts[idx] = currentProducts[j];
+  currentProducts[j] = tmp;
+  renderProducts();
+  updateDirty();
+}
+
 function addProduct() {
   // ⚠️ origStock을 넣지 않음 — 신규 상품에 origStock:null이 있으면, 같은 이름으로
   // 재등록했을 때 서버가 "재고 안 바꿈"으로 판단해 시트의 옛 재고(품절 0 등)를 상속해버림
-  currentProducts.push({
+  // 새 상품은 맨 위(= 손님 화면 맨 앞, 신상 자리)로 추가
+  currentProducts.unshift({
     name: '', price: 0, active: true, stock: null,
     imageUrl: '', brand: '', description: ''
   });
   renderProducts();
   updateDirty();
   setTimeout(() => {
-    const inputs = document.querySelectorAll('#productsContainer .product-row input[data-field="name"]');
-    inputs[inputs.length - 1]?.focus();
+    document.querySelector('#productsContainer .product-row input[data-field="name"]')?.focus();
   }, 50);
 }
 
@@ -1404,7 +1450,8 @@ async function saveAll() {
         action: 'updateConfig',
         pw: password,
         settings: currentSettings,
-        products: currentProducts
+        // 화면은 손님 순서(최신이 위) — 시트에는 뒤집어서 기록 (마지막 행 = 손님 맨 앞)
+        products: [...currentProducts].reverse()
       })
     });
 
@@ -1417,7 +1464,7 @@ async function saveAll() {
       const r2 = await fetch(`${CONFIG.scriptUrl}?action=getAdminConfig&pw=${encodeURIComponent(password)}`);
       const fresh = await r2.json();
       if (fresh.error) throw new Error(fresh.error);
-      const products = fresh.products.map(p => ({ ...p, origStock: p.stock }));
+      const products = fresh.products.map(p => ({ ...p, origStock: p.stock })).reverse();
       originalSettings = { ...fresh.settings };
       originalProducts = JSON.parse(JSON.stringify(products));
       currentSettings = { ...fresh.settings };

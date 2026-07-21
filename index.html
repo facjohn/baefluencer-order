@@ -340,7 +340,8 @@
       color: var(--color-price);
       letter-spacing: -0.3px;
     }
-    .product-card.sold-out .price { color: var(--color-text-sub); }
+    /* 완판 상품은 가격 숨김 — 완판 사실만 남기고 다음 판매 가격은 열어둠 */
+    .product-card.sold-out .price { display: none; }
 
     /* ─────────── 상세 페이지 ─────────── */
     .back-btn {
@@ -2360,7 +2361,8 @@ function renderDetail(p) {
     brand.style.display = 'none';
   }
   document.getElementById('detailName').textContent = p.name;
-  document.getElementById('detailPrice').textContent = p.price.toLocaleString() + '원';
+  // 완판 상품은 가격 숨김 (그리드 카드와 동일 정책)
+  document.getElementById('detailPrice').textContent = isOut ? '' : (p.price.toLocaleString() + '원');
 
   const desc = document.getElementById('detailDescription');
   if (p.description) {
