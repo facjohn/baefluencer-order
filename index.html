@@ -2284,7 +2284,10 @@ function renderMarketGrid() {
       '<div style="grid-column:1/-1; text-align:center; padding:48px 0; color:var(--color-text-sub); font-size:14px; font-weight:600;">😴 현재 판매 중인 상품이 없습니다</div>';
     return;
   }
-  SHOP.products.forEach((p, i) => {
+  // 최신 등록 상품(시트 마지막 행)이 맨 앞에 오도록 역순 표시
+  // i는 SHOP.products의 원래 인덱스 그대로 — goToDetail(i)·장바구니 매핑이 안 깨짐
+  for (let i = SHOP.products.length - 1; i >= 0; i--) {
+    const p = SHOP.products[i];
     const stock = getStock(p);
     const isOut = stock !== null && stock <= 0;
     const isLow = stock !== null && stock > 0 && stock <= LOW_STOCK_THRESHOLD;
@@ -2322,7 +2325,7 @@ function renderMarketGrid() {
       card.addEventListener('click', () => goToDetail(i));
     }
     grid.appendChild(card);
-  });
+  }
 }
 
 /* 상세 페이지 렌더링 */
