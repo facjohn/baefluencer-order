@@ -501,6 +501,22 @@
       font-size: 12.5px !important;
       padding: 7px 10px !important;
     }
+    /* 설명은 여러 줄 — 엔터로 줄바꿈, 내용에 맞춰 자동으로 늘어남 */
+    .product-row-extra textarea {
+      flex: 1;
+      font-size: 12.5px;
+      padding: 7px 10px;
+      border: 1.5px solid var(--color-border);
+      border-radius: 8px;
+      font-family: inherit;
+      line-height: 1.45;
+      min-height: 38px;
+      resize: vertical;
+      -webkit-appearance: none;
+      background: white;
+    }
+    .product-row-extra textarea:focus { outline: none; border-color: var(--color-primary); }
+    .product-row textarea.changed { border-color: var(--color-accent); background: #FFF8F2; }
     .product-row-extra .image-preview {
       width: 32px;
       height: 32px;
@@ -823,7 +839,7 @@
         💡 <strong>순서</strong>: 목록 순서 = 손님 화면 순서 (맨 위가 맨 앞). ▲▼로 변경, 새 상품은 맨 위(신상 자리)로 추가됨<br>
         💡 <strong>재고</strong>: 비우면 무제한, 숫자 입력 시 주문마다 자동 차감 (20개 이하면 폼에서 "N개 남음" 빨강 펄스 배지 표시)<br>
         💡 <strong>브랜드</strong>: 카드 상단에 작게 표시 (예: "배플루언서 농가직송")<br>
-        💡 <strong>설명</strong>: 상품 상세 페이지에 표시되는 한 줄 (예: "당도 14브릭스 이상")<br>
+        💡 <strong>설명</strong>: 상품 상세 페이지에 표시 — 엔터로 줄을 나눠 여러 줄 작성 가능 (예: "당도 14브릭스 이상")<br>
         💡 <strong>이미지</strong>: 📷 버튼으로 사진을 바로 올리면 끝 (자동 압축·저장). 외부 URL 붙여넣기도 가능 (모두 선택, 비어도 정상)<br>
         💡 <strong>완판일</strong>: 재고가 0(완판)이 되면 손님 카드에 "2026년 2월 + 완판 SOLD OUT"으로 표시 — 완판 이력 마케팅용<br>
         💡 <strong>삭제 🗑</strong>는 정말 없앨 때만 — 판매만 멈추려면 '판매' 체크 해제 (이력·통계·환불 재고복원 보존)<br>
@@ -1019,9 +1035,10 @@ function applyConfig(data) {
 }
 
 function showMain(data) {
-  applyConfig(data);
+  // 화면을 먼저 보이게 한 뒤 렌더 — 숨겨진(display:none) 상태에서는 설명칸 자동 높이가 0으로 계산됨
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('mainScreen').classList.add('show');
+  applyConfig(data);
   loadStats(true);
   startAutoRefresh();
 }
@@ -1258,10 +1275,10 @@ function renderProducts() {
         <input type="text" data-field="brand" placeholder="예: 배플루언서 농가직송 (선택)"
                value="${escapeAttr(product.brand || '')}">
       </div>
-      <div class="product-row-extra">
-        <span class="extra-label">📝 설명</span>
-        <input type="text" data-field="description" placeholder="상세 페이지에 표시될 한 줄 설명 (선택)"
-               value="${escapeAttr(product.description || '')}">
+      <div class="product-row-extra" style="align-items:flex-start;">
+        <span class="extra-label" style="padding-top:9px;">📝 설명</span>
+        <textarea data-field="description" rows="2"
+                  placeholder="상세 페이지 설명 — 엔터로 줄을 나눠 여러 줄 입력 가능 (선택)">${escapeAttr(product.description || '')}</textarea>
       </div>
       <div class="product-row-extra">
         <span class="extra-label">🗓 완판일</span>
@@ -1340,9 +1357,15 @@ function renderProducts() {
       markChanged(brandInput, i, 'brand');
       updateDirty();
     });
+    const autoGrow = el => {
+      if (!el.offsetParent) return;   // 숨겨진 상태면 scrollHeight가 0 — rows="2" 기본값 유지
+      el.style.height = 'auto';
+      el.style.height = Math.max(38, el.scrollHeight + 2) + 'px';
+    };
     descInput.addEventListener('input', () => {
       currentProducts[i].description = descInput.value;
       markChanged(descInput, i, 'description');
+      autoGrow(descInput);
       updateDirty();
     });
     soldOutDateInput.addEventListener('input', () => {
@@ -1411,6 +1434,8 @@ function renderProducts() {
     });
 
     container.appendChild(row);
+    // 붙인 뒤에야 scrollHeight가 잡힘 — 기존 설명 줄 수에 맞춰 높이 조정
+    if (descInput && descInput.value) autoGrow(descInput);
   });
 
   updateLowStockBanner();
