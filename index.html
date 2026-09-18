@@ -1461,15 +1461,22 @@
       color: #92400E;
       padding: 11px 14px;
       border-radius: 10px;
-      font-size: 13px;
-      font-weight: 800;
+      font-size: 14px;
+      font-weight: 700;
       letter-spacing: -0.2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
+      line-height: 1.6;
+      display: block;          /* flex로 두면 강조 글자가 따로 떨어져 단어 중간에서 줄이 갈림 */
+      text-align: center;
+      word-break: keep-all;    /* 단어 단위로만 줄바꿈 */
       animation: noticePulse 2.2s ease-in-out infinite;
       box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+    }
+    .payment-notice strong { font-weight: 900; }
+    .payment-notice .sub {
+      display: block;
+      margin-top: 5px;
+      font-size: 12.5px;
+      font-weight: 600;
     }
     @keyframes noticePulse {
       0%, 100% { transform: scale(1); }
@@ -2088,8 +2095,9 @@
         <button class="copy-btn big-copy" onclick="copyAccount(this)">📋 계좌 복사</button>
       </div>
       <div class="payment-notice">
-        💳 <strong>지금 바로 입금</strong>해 주셔야 재고 확보 후 발송이 완료돼요.<br>
-        입금하신 순서대로 발송되니 양해 부탁드립니다.
+        💳 <strong>지금 바로 입금</strong>해 주셔야<br>
+        재고 확보 후 발송이 완료돼요.
+        <span class="sub">입금하신 순서대로 발송되니 양해 부탁드립니다.</span>
       </div>
       <div style="margin-top:10px; font-size:12px; color:var(--color-text-sub); font-weight:600; line-height:1.6;">
         ✏️ 주문 취소·변경은 인스타그램 DM
