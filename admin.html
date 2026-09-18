@@ -744,6 +744,12 @@
       </div>
       <button class="logout-btn" onclick="logout()">로그아웃</button>
     </div>
+    <!-- 서버(Code.gs)가 옛 버전이면 알림 — 재배포가 됐는지 화면에서 바로 확인 -->
+    <div id="verBanner" style="display:none; margin-bottom:14px; padding:12px 14px; border-radius:10px;
+         background:#FFFBEB; border:1.5px solid #F59E0B; color:#92400E; font-size:13px; font-weight:700; line-height:1.5;">
+      ⚠️ 서버(Code.gs)가 옛 버전이에요 — 상세주소 열 분리·설명 줄바꿈 저장·자동 로그인이 아직 적용되지 않았어요.
+      Apps Script에서 Code.gs 붙여넣기 → 새 버전 배포 → 📋 시트 초기 설정을 진행해주세요.
+    </div>
     <!-- 비상 스위치가 켜져 있으면 눈에 띄게 — 켜둔 채 잊고 라이브를 하는 사고 방지 -->
     <div id="pauseBanner" style="display:none; margin-bottom:14px; padding:12px 14px; border-radius:10px;
          background:#FEF2F2; border:1.5px solid #DC2626; color:#991B1B; font-size:13.5px; font-weight:700; line-height:1.5;">
@@ -896,7 +902,15 @@ function isPauseValue(v) {
 /* ============================================
    상태 관리
    ============================================ */
-let password = '';
+let password = '';       // 구서버(토큰 미지원)용 — 이번 세션 메모리에만 두고 저장소에는 절대 남기지 않음
+let adminToken = '';     // 새 서버가 로그인 시 발급한 세션 토큰(24시간) — 브라우저 저장소에는 이것만 저장
+try {
+  adminToken = localStorage.getItem('admin_token') || '';
+  localStorage.removeItem('admin_pw');   // 예전 버전이 저장해 둔 비밀번호 원문 제거
+} catch (e) {}
+function saveToken() { try { localStorage.setItem('admin_token', adminToken); } catch (e) {} }
+function clearToken() { adminToken = ''; try { localStorage.removeItem('admin_token'); } catch (e) {} }
+function authFields() { return adminToken ? { adminToken: adminToken } : { pw: password }; }
 let originalSettings = {};
 let originalProducts = [];
 let currentSettings = {};
@@ -934,8 +948,14 @@ async function postJson(body, timeoutMs) {
 
 /* 관리자 API 공용 호출 — 비번을 GET 쿼리 대신 POST 본문으로 전송
    (GET 쿼리는 브라우저 히스토리·GAS 실행 로그에 비번이 평문으로 남음) */
-async function adminApi(action, extra) {
-  return postJson(Object.assign({ action: action, pw: password }, extra || {}));
+async function adminApi(action, extra, timeoutMs) {
+  const data = await postJson(Object.assign({ action: action }, authFields(), extra || {}), timeoutMs);
+  // 세션 토큰 만료·폐기 — 저장된 토큰을 지우고 다시 로그인하도록 안내
+  if (data && data.error === 'Unauthorized' && adminToken) {
+    clearToken();
+    throw new Error('로그인 세션이 만료됐어요. 로그아웃 후 다시 로그인해주세요 (편집 중인 내용은 메모해 두세요)');
+  }
+  return data;
 }
 
 /* ============================================
@@ -949,7 +969,7 @@ async function login(isAuto) {
   const errorEl = document.getElementById('loginError');
   errorEl.textContent = '';
 
-  if (!pw) {
+  if (!isAuto && !pw) {
     errorEl.textContent = '비밀번호를 입력해주세요';
     return;
   }
@@ -959,35 +979,45 @@ async function login(isAuto) {
   }
 
   loginInFlight = true;
+  let legacyMode = false;
   try {
-    // POST 본문으로 인증 — 비번이 URL(히스토리·서버 로그)에 남지 않음
-    const data = await postJson({ action: 'getAdminConfig', pw: pw });
-
-    if (data.error) {
-      // 서버(Code.gs)가 새 버전으로 배포되지 않은 상태 — 비밀번호 문제가 아님.
-      // 저장된 비번은 지우지 않음 (재배포 후 자동 로그인이 그대로 동작하도록)
-      if (/Unknown action/i.test(String(data.error))) {
-        errorEl.textContent = '⚠️ 서버(Code.gs)가 아직 옛 버전이에요. Apps Script에서 "배포 → 배포 관리 → ✏️ 편집 → 새 버전 → 배포"를 먼저 한 뒤 다시 로그인해주세요. (비밀번호 문제 아님)';
+    let data;
+    if (isAuto) {
+      // 저장된 세션 토큰으로 조용히 로그인 — 실패해도 오답 카운터에는 영향 없음
+      data = await postJson({ action: 'getAdminConfig', adminToken: adminToken });
+      if (data.error) {
+        clearToken();   // 만료·폐기된 토큰 — 로그인 화면 유지
+        if (!/Unauthorized/.test(String(data.error))) errorEl.textContent = '오류: ' + data.error;
         return;
       }
-      // 오답이면 저장된 비번 삭제. 자동 로그인(isAuto) 실패는 잠금 메시지여도 삭제 —
-      // 잠금 중엔 서버가 'Unauthorized' 대신 잠금 안내를 돌려주는데, 이때 옛 비번을
-      // 남겨두면 페이지를 열 때마다 오답 자동 전송이 반복되어 잠금이 영속화됨
-      if (data.error === 'Unauthorized' || isAuto) {
-        localStorage.removeItem('admin_pw');
-        errorEl.textContent = (data.error === 'Unauthorized')
-          ? '비밀번호가 틀렸습니다'
-          : '오류: ' + data.error + (isAuto ? ' (저장된 비밀번호를 지웠어요 — 직접 입력해주세요)' : '');
+    } else {
+      // 1) 비밀번호로 로그인 → 서버가 세션 토큰 발급 (비번은 URL·저장소 어디에도 남지 않음)
+      const r = await postJson({ action: 'adminLogin', pw: pw });
+      if (r.success && r.token) {
+        adminToken = r.token; saveToken();
+        password = '';
+        data = await postJson({ action: 'getAdminConfig', adminToken: adminToken });
+      } else if (/Unknown action/i.test(String(r.error))) {
+        // 2) 토큰을 모르는 옛 서버 — 이번 세션만 비밀번호로 동작 (저장 안 함)
+        password = pw; clearToken();
+        data = await postJson({ action: 'getAdminConfig', pw: pw });
+        if (data.error && /Unknown action/i.test(String(data.error))) {
+          errorEl.textContent = '⚠️ 서버(Code.gs)가 아직 옛 버전이에요. Apps Script에서 "배포 → 배포 관리 → ✏️ 편집 → 새 버전 → 배포"를 먼저 한 뒤 다시 로그인해주세요. (비밀번호 문제 아님)';
+          return;
+        }
+        legacyMode = true;
       } else {
-        errorEl.textContent = '오류: ' + data.error;
+        errorEl.textContent = (r.error === 'Unauthorized') ? '비밀번호가 틀렸습니다' : '오류: ' + (r.error || '로그인 실패');
+        return;
       }
-      return;
+      if (data.error) { errorEl.textContent = '오류: ' + data.error; return; }
     }
 
     // 로그인 성공
-    password = pw;
-    localStorage.setItem('admin_pw', pw);
     showMain(data);
+    if (legacyMode) {
+      showToast('서버가 옛 버전이라 이번 화면에서만 로그인이 유지돼요 — Code.gs 재배포 후 다시 로그인하면 자동 로그인이 켜져요', 'error', 8000);
+    }
   } catch (err) {
     errorEl.textContent = '연결 오류: ' + err.message;
   } finally {
@@ -999,8 +1029,10 @@ function logout() {
   if (isDirty && !confirm('저장되지 않은 변경사항이 있습니다. 정말 로그아웃하시겠습니까?')) {
     return;
   }
-  localStorage.removeItem('admin_pw');
+  const t = adminToken;
+  clearToken();
   password = '';
+  if (t) postJson({ action: 'adminLogout', adminToken: t }).catch(() => {});   // 서버 측 토큰 폐기 (실패해도 무방)
   isDirty = false;  // 이탈 경고·저장 바 상태 초기화
   document.getElementById('bottomBar').classList.remove('show');
   document.getElementById('mainScreen').classList.remove('show');
@@ -1032,6 +1064,9 @@ function applyConfig(data) {
   // 서버가 알려주는 접수 중지 상태 (구서버는 필드 없음 → 숨김). 시트에서 직접 켠 경우도 잡힘
   const pb = document.getElementById('pauseBanner');
   if (pb) pb.style.display = (data.orderPaused === true || isPauseValue(data.settings['주문 접수 중지'])) ? '' : 'none';
+  // 서버 세대 확인 — 4 = 상세주소 열·토큰 세션 판. 없거나 낮으면 재배포 안내
+  const vb = document.getElementById('verBanner');
+  if (vb) vb.style.display = (data.apiVersion == null || Number(data.apiVersion) < 4) ? '' : 'none';
 }
 
 function showMain(data) {
@@ -1089,7 +1124,7 @@ let autoRefreshBusy = false;   // 서버가 느릴 때 새로고침이 겹쳐 �
 function startAutoRefresh() {
   clearInterval(autoRefreshTimer);
   autoRefreshTimer = setInterval(() => {
-    if (!password || document.hidden || autoRefreshBusy) return;
+    if (!(adminToken || password) || document.hidden || autoRefreshBusy) return;
     if (!document.getElementById('mainScreen').classList.contains('show')) return;
     autoRefreshBusy = true;
     loadStats(false, true).then(() => { autoRefreshBusy = false; }, () => { autoRefreshBusy = false; });
@@ -1530,7 +1565,7 @@ async function uploadImageFile(product, file, btn) {
 
   try {
     const dataUrl = await compressImage(file);
-    const result = await postJson({ action: 'uploadImage', pw: password, imageData: dataUrl }, 120000);
+    const result = await adminApi('uploadImage', { imageData: dataUrl }, 120000);
     if (!result.success) throw new Error(result.error || '업로드 실패');
 
     // 업로드하는 동안 목록이 바뀌었을 수 있으니 객체 → 이름 순으로 다시 찾음
@@ -1769,9 +1804,7 @@ function showToast(msg, type, ms) {
    페이지 로드 시 자동 로그인 시도
    ============================================ */
 async function autoLogin() {
-  const savedPw = localStorage.getItem('admin_pw');
-  if (!savedPw) return;
-  document.getElementById('pwInput').value = savedPw;
+  if (!adminToken) return;   // 저장된 세션 토큰이 있을 때만 (비밀번호는 더 이상 저장하지 않음)
   await login(true);
 }
 
