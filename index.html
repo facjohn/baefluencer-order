@@ -75,12 +75,6 @@
       padding: 32px 0 24px;
       position: relative;
     }
-    .header-emoji {
-      font-size: 40px;
-      display: block;
-      margin-bottom: 8px;
-      animation: bounce 2s ease-in-out infinite;
-    }
     .header-video {
       display: block;
       width: 200px;
@@ -91,10 +85,6 @@
       object-position: center 20%;
       box-shadow: 0 6px 24px rgba(0,0,0,0.15);
       background: #000;
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
     }
     .header h1 {
       font-size: 22px;
@@ -110,8 +100,7 @@
     /* 상세·주문서 화면에서는 헤더를 접어 상품 사진·입력칸이 첫 화면에 바로 보이게
        (200px 영상 + 제목이 화면 절반을 차지해 중장년 손님이 한참 내려야 했음) */
     .header.compact { padding: 14px 0 6px; }
-    .header.compact .header-video,
-    .header.compact .header-emoji { display: none !important; }
+    .header.compact .header-video { display: none !important; }
     .header.compact h1 { font-size: 16px; }
     .header.compact .subtitle { display: none; }
 
@@ -1695,9 +1684,9 @@
   </div>
 
   <div class="header" id="shopHeader" style="display:none;">
+    <!-- 헤더 영상이 없거나 로드 실패하면 영상 자리만 비우고 가게 이름부터 표시 -->
     <video class="header-video" src="header.mp4" autoplay loop muted playsinline preload="auto"
-           onerror="this.style.display='none'; document.getElementById('headerEmoji').style.display='block';"></video>
-    <span class="header-emoji" id="headerEmoji" style="display:none;">🍓</span>
+           onerror="this.style.display='none';"></video>
     <h1 id="shopTitle"></h1>
     <p class="subtitle">주문해 주셔서 감사합니다</p>
   </div>
@@ -2028,7 +2017,6 @@ const CONFIG = {
 //    로드 실패 시 showLoadError()가 에러 화면을 표시.
 let SHOP = {
   shopName: '',
-  headerEmoji: '🍓',
   bank: { name: '', account: '', holder: '' },
   maxQty: 10,
   products: []
@@ -2082,16 +2070,13 @@ async function init() {
   bindSenderSync();
   document.getElementById('loadingScreen').classList.add('hidden');
   document.getElementById('shopHeader').style.display = '';
-  // iOS 저전력 모드 등에서 자동재생이 거부되면 검은 원+▶ 대신 이모지로 대체
+  // iOS 저전력 모드 등에서 자동재생이 거부되면 검은 원+▶ 가 남지 않게 영상을 숨김
   const hv = document.querySelector('.header-video');
   if (hv && typeof hv.play === 'function') {
     try {
       const pr = hv.play();
       if (pr && typeof pr.catch === 'function') {
-        pr.catch(() => {
-          hv.style.display = 'none';
-          document.getElementById('headerEmoji').style.display = 'block';
-        });
+        pr.catch(() => { hv.style.display = 'none'; });
       }
     } catch (e) {}
   }
@@ -2480,8 +2465,6 @@ async function loadConfig(retry = true) {
 function renderShop() {
   document.getElementById('shopTitle').textContent = SHOP.shopName;
   document.title = `주문하기 - ${SHOP.shopName}`;
-  // 헤더 영상이 없거나 로드 실패하면 video의 onerror가 이 이모지를 대신 표시
-  document.getElementById('headerEmoji').textContent = SHOP.headerEmoji || '🍓';
   document.getElementById('bankDisplay').textContent =
     `${SHOP.bank.name} ${SHOP.bank.account}`;
   // 마켓 그리드 렌더 (라디오 방식은 마켓 카드로 대체됨)
